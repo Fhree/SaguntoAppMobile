@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
@@ -15,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.sagunto.saguntoappmobile.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,7 +31,7 @@ val ButtonText = Color(0xFF0B2918)
 val InputBg = Color(0xFFF2F2F2)
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(onLoginSuccess: () -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -51,19 +54,14 @@ fun LoginScreen() {
             Icon(Icons.Default.Star, contentDescription = "Logo", modifier = Modifier.size(60.dp), tint = DarkGreenBg)
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text("Bienvenido", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-        Text("Gestión de bar profesional", color = Color.Gray, fontSize = 16.sp)
-
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(100.dp))
 
         // Inputs
-        LoginLabel("USUARIO")
+        LoginLabel(stringResource(R.string.loginLabel_user))
         TextField(
             value = username,
             onValueChange = { username = it },
-            placeholder = { Text("Introduce tu usuario") },
+            placeholder = { Text(stringResource(R.string.txtBox_user_placeholder)) },
             leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = InputBg,
@@ -77,7 +75,7 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        LoginLabel("CONTRASEÑA")
+        LoginLabel(stringResource(R.string.loginLabel_password))
         TextField(
             value = password,
             onValueChange = { password = it },
@@ -96,16 +94,15 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Button
         Button(
-            onClick = { /* TODO */ },
+            onClick = { onLoginSuccess() },
             colors = ButtonDefaults.buttonColors(containerColor = LimeGreen),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth().height(55.dp)
         ) {
-            Text("Acceder", color = ButtonText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.btn_log_in), color = ButtonText, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.width(8.dp))
-            Icon(Icons.Default.ArrowForward, contentDescription = null, tint = ButtonText)
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = ButtonText)
         }
     }
 }
@@ -124,5 +121,5 @@ fun LoginLabel(text: String) {
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
-    LoginScreen()
+    LoginScreen(onLoginSuccess = {})
 }

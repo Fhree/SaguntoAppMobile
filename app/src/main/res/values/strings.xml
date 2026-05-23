@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">SaguntoAppMobile</string>
+    <string name="btn_log_in">Acceder</string>
+    <string name="loginLabel_user">USUARIO</string>
+    <string name="loginLabel_password">PASSWORD</string>
+    <string name="txtBox_user_placeholder">Introduce tu usuario</string>
+    <string name="txt_main_menu">Main Menu</string>
+    <string name="btn_AddOrder">Consumición</string>
+    <string name="btn_subTitle_AddOrder">Registrar nuevas consumiciones</string>
+    <string name="btn_PayOrder">Cobrar</string>
+    <string name="btn_subTitle_PayOrder">Gestionar pagos pendientes</string>
+    <string name="btn_AddProduct">Añadir producto</string>
+    <string name="btn_subTitle_AddProduct">Añadir productos al catalogo</string>
+    <string name="btn_checkConsumption">Comprobar consumo</string>
+    <string name="btn_subTitle_checkConsumption">Ver históricos y estadísticas</string>"
+    <string name="btn_addSaguntino">Añadir saguntino</string>
+    <string name="btn_subTitle_addSaguntino">Registrar nuevos saguntinos</string>"
 </resources>
