@@ -1,5 +1,6 @@
 package com.sagunto.saguntoappmobile.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -26,13 +27,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.vectorResource
 import com.sagunto.saguntoappmobile.ui.screens.DarkGreenBg
 
 @Composable
 fun MenuOptionCard(
     title: String,
     subtitle: String,
-    icon: ImageVector,
+    iconResId: Int,
     iconTint: Color,
     iconBgColor: Color,
     onClick: () -> Unit
@@ -40,11 +42,13 @@ fun MenuOptionCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .background(Color(0xff9ad99a))
             .padding(vertical = 8.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .clickable { onClick() }, // Hace que toda la tarjeta sea un botón interactivo
+            //.clip(RoundedCornerShape(16.dp))
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Le da la sombra de la imagen 2
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(2.dp, Color(0xff069435))
     ) {
         Row(
             modifier = Modifier
@@ -52,20 +56,20 @@ fun MenuOptionCard(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 1. Icono de la izquierda con su fondo
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(90.dp))
                     .background(iconBgColor),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(imageVector = icon, contentDescription = null, tint = iconTint)
+                Icon(imageVector = ImageVector.vectorResource(id = iconResId),
+                    contentDescription = null,
+                    tint = Color.Unspecified)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // 2. Textos centrales (el weight empuja la flecha a la derecha)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
@@ -80,7 +84,6 @@ fun MenuOptionCard(
                 )
             }
 
-            // 3. Flecha de la derecha
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Ir",

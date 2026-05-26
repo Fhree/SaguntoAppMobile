@@ -27,15 +27,38 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "login") {
                         composable("login") {
-                            LoginScreen(// se la vista donde estas
+                            LoginScreen(// es la vista donde estas
                                 onLoginSuccess = { // en este caso, en caso de conseguir un login correcto nos redirecciona a la vista de MainMenuScreen
+                                    //onLoginSuccess se declara en la definición de la LoginScreen como una función de callback
                                     navController.navigate("main_menu")
                                 }
                             )
                         }
 
                         composable("main_menu") {
-                            MainMenuScreen()
+                            MainMenuScreen(
+                                onClickNavToAddOrder = {navController.navigate("add_order")},
+                                onClickNavToPayment = {navController.navigate("payment")},
+                                onClickNavToAddProduct = {navController.navigate("add_product")},
+                                onClickNavToCheckStatistics = {navController.navigate("check_statistics")},
+                                onClickNavToAddUser = {navController.navigate("add_user")}
+                            )
+                        }
+
+                        composable("add_order"){
+                            AddOrderScreen()
+                        }
+                        composable("payment"){
+                            PaymentScreen()
+                        }
+                        composable("add_product"){
+                            AddProductScreen()
+                        }
+                        composable("check_statistics"){
+                            CheckStatisticsScreen()
+                        }
+                        composable("add_user"){
+                            AddUserScreen()
                         }
                     }
                 }

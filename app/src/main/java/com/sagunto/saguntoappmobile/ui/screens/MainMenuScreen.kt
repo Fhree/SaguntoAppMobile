@@ -5,13 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,11 +26,17 @@ val LightGreenIconBg = Color(0xFFE8F5E9)
 val LightBlueIconBg = Color(0xFFE3F2FD)
 
 @Composable
-fun MainMenuScreen() {
+fun MainMenuScreen(
+    onClickNavToAddOrder: () -> Unit,
+    onClickNavToPayment: () -> Unit,
+    onClickNavToAddProduct: () -> Unit,
+    onClickNavToCheckStatistics: () -> Unit,
+    onClickNavToAddUser: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color(0xff9ad99a))
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center)
@@ -48,37 +51,46 @@ fun MainMenuScreen() {
         MenuOptionCard(
             title = "Consumición",
             subtitle = "Registrar nuevas comandas",
-            icon = Icon,
+            iconResId = R.drawable.add_order,
             iconTint = Color.Green,
             iconBgColor = LightGreenIconBg,
-            onClick = { /* TODO: Navegar a Consumición */ }
+            onClick = { onClickNavToAddOrder() }
         )
 
         MenuOptionCard(
             title = "Cobrar",
             subtitle = "Gestionar pagos pendientes",
-            icon = Icons.Default.ShoppingCart,
+            iconResId = R.drawable.payment,
             iconTint = Color.Blue,
             iconBgColor = LightBlueIconBg,
-            onClick = { /* TODO: Navegar a Cobrar */ }
+            onClick = { onClickNavToPayment() }
         )
 
         MenuOptionCard(
             title = "Añadir producto",
             subtitle = "Actualizar el inventario",
-            icon = Icons.Default.AddCircle,
+            iconResId = R.drawable.add_product,
             iconTint = Color.Red,
             iconBgColor = LightGreenIconBg,
-            onClick = { /* TODO: Navegar a Añadir producto */ }
+            onClick = { onClickNavToAddProduct() }
+        )
+
+        MenuOptionCard(
+            title = "Comprobar consumo",
+            subtitle = "Ver históricos y estadísticas",
+            iconResId = R.drawable.stadistics,
+            iconTint = Color.Red,
+            iconBgColor = LightGreenIconBg,
+            onClick = { onClickNavToCheckStatistics() }
         )
 
         MenuOptionCard(
             title = "Añadir saguntino",
             subtitle = "Registrar nuevo cliente VIP",
-            icon = Icons.Default.Person,
+            iconResId = R.drawable.add_user,
             iconTint = Color.Cyan,
             iconBgColor = LightBlueIconBg,
-            onClick = { /* TODO: Navegar a Añadir saguntino */ }
+            onClick = { onClickNavToAddUser() }
         )
     }
 }

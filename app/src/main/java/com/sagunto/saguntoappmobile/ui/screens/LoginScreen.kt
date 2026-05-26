@@ -1,4 +1,4 @@
-package com.sagunto.saguntoappmobile.ui.screens // <--- UPDATED PACKAGE NAME
+package com.sagunto.saguntoappmobile.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
