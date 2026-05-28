@@ -15,4 +15,7 @@
     <string name="btn_subTitle_checkConsumption">Ver históricos y estadísticas</string>"
     <string name="btn_addSaguntino">Añadir saguntino</string>
     <string name="btn_subTitle_addSaguntino">Registrar nuevos saguntinos</string>"
+    <string name="txt_add_order">Crear consumición"</string>
+    <string name="txt_product">Producto</string>
+    <string name="btn_addProducts">Añadir producto</string>"
 </resources>

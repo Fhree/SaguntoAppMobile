@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sagunto.saguntoappmobile.ui.screens.*
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
+import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +55,9 @@ class MainActivity : ComponentActivity() {
                             PaymentScreen()
                         }
                         composable("add_product"){
-                            AddProductScreen()
+                            val addProductViewModel = koinViewModel<AddProductViewModel>()
+
+                            AddProductScreen(viewModel = addProductViewModel)
                         }
                         composable("check_statistics"){
                             CheckStatisticsScreen()
