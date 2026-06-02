@@ -1,26 +1,43 @@
 package com.sagunto.saguntoappmobile.data.repository
 
+import android.util.Log
+import com.sagunto.saguntoappmobile.BuildConfig
 import com.sagunto.saguntoappmobile.domain.models.Product
 import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
 import com.sagunto.saguntoappmobile.data.network.dto.CreateProductRequest
+import io.ktor.client.HttpClient
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 
-class ProductRepository : IProductRepository {
+class ProductRepository(
+    private val httpClient: HttpClient
+) : IProductRepository {
 
     override suspend fun addProduct(product: Product): Result<Unit> {
-        try {
-            // 1. Mapeamos del Dominio puro al DTO sucio
+        return try {
             val request = CreateProductRequest(
                 name = product.name,
-                publicPrice = product.publicPrice,
-                privatePrice = product.privatePrice
+                priceMember = product.publicPrice,
+                priceGuest = product.privatePrice
             )
 
-            // 2. Aquí harías tu llamada HttpClient al backend de .NET
-            // o guardarías en SQLite con EF Core/Room.
-            // api.postProduct(dto)
+            val response = httpClient.post("api/products") {
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
 
-            return Result.success(Unit)
+
+            if (response.status.isSuccess()) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Fallo en la API. Código HTTP: ${response.status.value}"))
+            }
+
         } catch (e: Exception) {
+            Log.e("API_ERROR", "💥 Ha fallado la petición HTTP", e)
             return Result.failure(e)
         }
     }

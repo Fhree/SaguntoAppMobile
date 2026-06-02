@@ -1,7 +1,10 @@
 package com.sagunto.saguntoappmobile.data.network.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class CreateProductRequest(
     val name: String,
-    val publicPrice: Double,
-    val privatePrice: Double
+    val priceMember: Double,
+    val priceGuest: Double
 )

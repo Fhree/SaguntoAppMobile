@@ -1,13 +1,21 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.sagunto.saguntoappmobile"
-    compileSdk {
-        version = release(36)
+    compileSdk = 36
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
     }
 
     defaultConfig {
@@ -18,6 +26,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val envBaseUrl = System.getenv("API_BASE_URL")//Producción
+
+        val properties = Properties()//Local
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            properties.load(FileInputStream(localPropertiesFile))
+        }
+        val localBaseUrl = properties.getProperty("API_BASE_URL")
+
+        val baseUrl = envBaseUrl ?: localBaseUrl
+        buildConfigField("String", "API_BASE_URL", if (baseUrl != null) "\"$baseUrl\"" else "\"http://10.0.2.2:7010/\"")
     }
 
     buildTypes {
@@ -33,15 +53,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
 }
 
 dependencies {
+    // UI y Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -52,7 +73,19 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.foundation)
-    implementation("io.insert-koin:koin-androidx-compose:4.2.1")
+
+    // Inyección de dependencias (Koin)
+    implementation(libs.koin.androidx.compose)
+
+    // Cliente HTTP (Ktor) y Serialización
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.serialization.json)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

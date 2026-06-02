@@ -1,5 +1,6 @@
 package com.sagunto.saguntoappmobile
 
+import com.sagunto.saguntoappmobile.data.network.provideHttpClient
 import com.sagunto.saguntoappmobile.data.repository.ProductRepository
 import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
@@ -9,6 +10,9 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val module = module {
+    // --- CAPA DE RED ---
+    single { provideHttpClient() }
+
     // --- CAPA DE DATOS (Repositorios, Bases de datos, APIs) ---
     singleOf(::ProductRepository) { bind<IProductRepository>() }
     // single<UserRepository> { UserRepositoryImpl() }

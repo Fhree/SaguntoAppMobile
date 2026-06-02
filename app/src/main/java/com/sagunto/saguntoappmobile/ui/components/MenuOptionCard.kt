@@ -44,7 +44,6 @@ fun MenuOptionCard(
             .fillMaxWidth()
             .background(Color(0xff9ad99a))
             .padding(vertical = 8.dp)
-            //.clip(RoundedCornerShape(16.dp))
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
