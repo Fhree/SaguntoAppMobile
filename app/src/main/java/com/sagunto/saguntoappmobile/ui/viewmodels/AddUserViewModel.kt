@@ -3,16 +3,16 @@ package com.sagunto.saguntoappmobile.ui.viewmodels
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sagunto.saguntoappmobile.domain.models.Product
-import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
+import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.domain.models.User
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AddProductViewModel(
-    private val repository: IProductRepository
+class AddUserViewModel(
+    private val repository: IUserRepository
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
@@ -20,41 +20,36 @@ class AddProductViewModel(
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
-
     var name = mutableStateOf("")
-    var publicPrice = mutableStateOf("")
-    var privatePrice = mutableStateOf("")
+    var surname =  mutableStateOf("")
+
+    var isNameTouched = mutableStateOf(false)
+    var isSurnameTouched = mutableStateOf(false)
 
     val isNameValid: Boolean
         get() = name.value.isNotBlank() && name.value.isNotEmpty()
-    val isPublicPriceValid: Boolean
-        get() = publicPrice.value.toDoubleOrNull()?.let { it > 0.0 } ?: false
-    val isPrivatePriceValid: Boolean
-        get() = privatePrice.value.toDoubleOrNull()?.let { it > 0.0 } ?: false
+    val isSurnameValid: Boolean
+        get() = surname.value.isNotBlank() && surname.value.isNotEmpty()
     val isFormValid: Boolean
-        get() = isNameValid && isPublicPriceValid && isPrivatePriceValid
+        get() = isNameValid && isSurnameValid
 
-    var isNameTouched = mutableStateOf(false)
-    var isPublicPriceTouched = mutableStateOf(false)
-    var isPrivatePriceTouched = mutableStateOf(false)
 
-    fun saveProduct() {
-        if (!isFormValid) return
+    fun saveUser() {
+        if(!isFormValid) return
 
         viewModelScope.launch {
             _isLoading.value = true
 
-            val product = Product(
+            val user = User(
                 name = name.value,
-                publicPrice = publicPrice.value.toDoubleOrNull() ?: 0.0,
-                privatePrice = privatePrice.value.toDoubleOrNull() ?: 0.0
+                surname = surname.value
             )
 
-            val result = repository.addProduct(product)
+            val result = repository.addUser(user)
 
             result.fold(
                 onSuccess = {
-                    _uiEvent.emit(UiEvent.ShowToast("Producto añadido correctamente"))
+                    _uiEvent.emit(UiEvent.ShowToast("Saguntino añadido correctamente"))
                 },
                 onFailure = {
                     _uiEvent.emit(UiEvent.ShowToast("Error al añadir el producto"))
@@ -63,11 +58,10 @@ class AddProductViewModel(
             if (result.isSuccess) {
                 name.value = ""
                 isNameTouched = mutableStateOf(false)
-                publicPrice.value = ""
-                isPublicPriceTouched = mutableStateOf(false)
-                privatePrice.value = ""
-                isPrivatePriceTouched = mutableStateOf(false)
+                surname.value = ""
+                isSurnameTouched = mutableStateOf(false)
             }
+
             _isLoading.value = false
         }
     }

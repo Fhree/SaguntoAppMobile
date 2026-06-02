@@ -1,9 +1,9 @@
 package com.sagunto.saguntoappmobile.data.repository
 
 import android.util.Log
-import com.sagunto.saguntoappmobile.domain.models.Product
-import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
-import com.sagunto.saguntoappmobile.data.network.dto.CreateProductRequest
+import com.sagunto.saguntoappmobile.data.network.dto.CreateUserRequest
+import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.domain.models.User
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -11,23 +11,22 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 
-class ProductRepository(
+class UserRepository (
     private val httpClient: HttpClient
-) : IProductRepository {
+) : IUserRepository {
 
-    override suspend fun addProduct(product: Product): Result<Unit> {
-        return try {
-            val request = CreateProductRequest(
-                name = product.name,
-                priceMember = product.publicPrice,
-                priceGuest = product.privatePrice
+    override suspend fun addUser(user: User): Result<Unit> {
+        return try{
+            val request = CreateUserRequest(
+                name = user.name,
+                surname = user.surname,
+                roleId = user.rolId
             )
 
-            val response = httpClient.post("api/products") {
+            val response = httpClient.post("api/users") {
                 contentType(ContentType.Application.Json)
                 setBody(request)
             }
-
 
             if (response.status.isSuccess()) {
                 Result.success(Unit)

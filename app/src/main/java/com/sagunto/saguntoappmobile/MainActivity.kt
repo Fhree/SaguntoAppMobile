@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.sagunto.saguntoappmobile.ui.screens.*
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
@@ -54,15 +55,13 @@ class MainActivity : ComponentActivity() {
                             PaymentScreen()
                         }
                         composable("add_product"){
-                            val addProductViewModel = koinViewModel<AddProductViewModel>()
-
-                            AddProductScreen(viewModel = addProductViewModel)
+                            AddProductScreen(viewModel = koinViewModel<AddProductViewModel>())
                         }
                         composable("check_statistics"){
                             CheckStatisticsScreen()
                         }
                         composable("add_user"){
-                            AddUserScreen()
+                            AddUserScreen(viewModel = koinViewModel<AddUserViewModel>())
                         }
                     }
                 }
