@@ -1,7 +1,7 @@
 package com.sagunto.saguntoappmobile.domain.interfaces
 
-import com.sagunto.saguntoappmobile.domain.models.User
+import com.sagunto.saguntoappmobile.data.network.dto.createUser.*
 
 interface IUserRepository {
-    suspend fun addUser(user: User): Result<Unit>
+    suspend fun addUser(user: CreateUserRequest): Result<CreateUserResponse>
 }

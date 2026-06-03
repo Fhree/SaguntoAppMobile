@@ -55,13 +55,13 @@ class MainActivity : ComponentActivity() {
                             PaymentScreen()
                         }
                         composable("add_product"){
-                            AddProductScreen(viewModel = koinViewModel<AddProductViewModel>())
+                            AddProductScreen(navController,viewModel = koinViewModel<AddProductViewModel>())
                         }
                         composable("check_statistics"){
                             CheckStatisticsScreen()
                         }
                         composable("add_user"){
-                            AddUserScreen(viewModel = koinViewModel<AddUserViewModel>())
+                            AddUserScreen(navController,viewModel = koinViewModel<AddUserViewModel>())
                         }
                     }
                 }

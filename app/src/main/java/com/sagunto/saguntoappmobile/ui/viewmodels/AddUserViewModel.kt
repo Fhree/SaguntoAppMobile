@@ -3,10 +3,12 @@ package com.sagunto.saguntoappmobile.ui.viewmodels
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sagunto.saguntoappmobile.data.network.dto.createUser.CreateUserRequest
 import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
 import com.sagunto.saguntoappmobile.domain.models.User
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -14,6 +16,13 @@ import kotlinx.coroutines.launch
 class AddUserViewModel(
     private val repository: IUserRepository
 ) : ViewModel() {
+
+    private val _showCodeDialog = MutableStateFlow(false)
+    val showCodeDialog: StateFlow<Boolean> = _showCodeDialog.asStateFlow()
+
+    private val _generatedSaguntinoCode = MutableStateFlow("")
+    val generatedSaguntinoCode: StateFlow<String> = _generatedSaguntinoCode.asStateFlow()
+
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -40,19 +49,21 @@ class AddUserViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
-            val user = User(
+            val user = CreateUserRequest(
                 name = name.value,
-                surname = surname.value
+                surname = surname.value,
+                roleId = 2 //Role Id basic user
             )
 
             val result = repository.addUser(user)
 
             result.fold(
-                onSuccess = {
-                    _uiEvent.emit(UiEvent.ShowToast("Saguntino añadido correctamente"))
+                onSuccess = { responseData ->
+                    _generatedSaguntinoCode.value = responseData.saguntinoCode
+                    _showCodeDialog.value = true
                 },
                 onFailure = {
-                    _uiEvent.emit(UiEvent.ShowToast("Error al añadir el producto"))
+                    _uiEvent.emit(UiEvent.ShowToast("Error al añadir el usuario"))
                 }
             )
             if (result.isSuccess) {
@@ -68,5 +79,10 @@ class AddUserViewModel(
 
     sealed class UiEvent {
         data class ShowToast(val message: String) : UiEvent()
+    }
+
+    fun dismissDialog() {
+        _showCodeDialog.value = false
+        _generatedSaguntinoCode.value = ""
     }
 }

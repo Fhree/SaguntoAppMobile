@@ -1,10 +1,9 @@
 package com.sagunto.saguntoappmobile.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -14,7 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 // Custom Colors
-val DarkGreenBg = Color(0xFF0B2918)
+val DarkGreenBg = Color(0xFF16291F)
 val LimeGreen = Color(0xff9ad99a)
 val ButtonText = Color(0xFF0B2918)
 val InputBg = Color(0xFFF2F2F2)
@@ -42,15 +40,15 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd) // Paso 1: Lo anclamos a la esquina inferior derecha
-                .offset(x = 150.dp, y = 110.dp) // Paso 2: Lo empujamos fuera de la pantalla por la mitad de su tamaño
+                .offset(x = 150.dp, y = 180.dp) // Paso 2: Lo empujamos fuera de la pantalla por la mitad de su tamaño
                 .requiredSize(650.dp),
             contentAlignment = Alignment.Center
+
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.icon_sagunto),
+            Image(
+                painter = painterResource(id = R.drawable.login_image_sagunto),
                 contentDescription = "Decoración de fondo", // Descripciones claras para accesibilidad
-                modifier = Modifier.fillMaxSize(),
-                tint = Color.Black
+                modifier = Modifier.fillMaxSize()
             )
         }
 

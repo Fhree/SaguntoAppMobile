@@ -18,5 +18,6 @@
     <string name="txt_add_order">Crear consumición"</string>
     <string name="txt_product">Producto</string>
     <string name="btn_addProducts">Añadir producto</string>
-    <string name="btn_addUser">Añadir usuario</string>"
+    <string name="btn_addUser">Añadir usuario</string>
+    <string name="btn_goBackToMenu">Volver al menu</string>"
 </resources>

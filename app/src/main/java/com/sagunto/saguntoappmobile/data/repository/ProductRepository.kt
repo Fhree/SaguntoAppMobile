@@ -3,7 +3,7 @@ package com.sagunto.saguntoappmobile.data.repository
 import android.util.Log
 import com.sagunto.saguntoappmobile.domain.models.Product
 import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
-import com.sagunto.saguntoappmobile.data.network.dto.CreateProductRequest
+import com.sagunto.saguntoappmobile.data.network.dto.createProduct.CreateProductRequest
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody

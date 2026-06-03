@@ -1,4 +1,4 @@
-package com.sagunto.saguntoappmobile.data.network.dto
+package com.sagunto.saguntoappmobile.data.network.dto.createUser
 
 import kotlinx.serialization.Serializable
 
