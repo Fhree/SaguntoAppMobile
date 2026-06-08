@@ -56,8 +56,7 @@ fun AddUserScreen(
             }
         }
     }
-
-    //pop-up de respuesta afirmativa
+    
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { /* ... */ },

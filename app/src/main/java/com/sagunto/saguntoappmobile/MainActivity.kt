@@ -8,14 +8,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.sagunto.saguntoappmobile.ui.screens.*
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
+import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,9 +35,8 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "login") {
                         composable("login") {
-                            LoginScreen(// es la vista donde estas
-                                onLoginSuccess = { // en este caso, en caso de conseguir un login correcto nos redirecciona a la vista de MainMenuScreen
-                                    //onLoginSuccess se declara en la definición de la LoginScreen como una función de callback
+                            LoginScreen(
+                                onLoginSuccess = {
                                     navController.navigate("main_menu")
                                 }
                             )
@@ -40,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
                         composable("main_menu") {
                             MainMenuScreen(
-                                onClickNavToAddOrder = {navController.navigate("add_order")},
+                                onClickNavToSelectCustomerType = {navController.navigate("select_customer_type")},
                                 onClickNavToPayment = {navController.navigate("payment")},
                                 onClickNavToAddProduct = {navController.navigate("add_product")},
                                 onClickNavToCheckStatistics = {navController.navigate("check_statistics")},
@@ -48,8 +52,25 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("add_order"){
-                            AddOrderScreen()
+                        composable("select_customer_type") {
+                            SelectCustomerTypeScreen(
+                                navController = navController,
+                                viewModel = koinViewModel<SelectCustomerTypeViewModel>(),
+                                onClickToAddOrder = { id ->
+                                    navController.navigate("add_order/$id")
+                                }
+                            )
+                        }
+                        composable(
+                            "add_order/{id}",
+                            arguments = listOf(
+                                navArgument("id") { type = NavType.IntType },
+                            )
+                        ){ backStackEntry ->
+                            val id = backStackEntry.arguments?.getInt("id") ?: -1
+
+                            AddOrderScreen(navController,
+                                viewModel = koinViewModel<AddOrderViewModel>(parameters = { parametersOf(id) }))
                         }
                         composable("payment"){
                             PaymentScreen()

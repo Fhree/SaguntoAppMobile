@@ -63,12 +63,11 @@ fun AddProductScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF9AD99A)))
-        }) {
-
-        Column(modifier = Modifier
+        }) {paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)
             .fillMaxSize()
             .background(Color(0xff9ad99a))
-            .padding(16.dp)) {
+            ) {
 
             Spacer(modifier = Modifier.height(150.dp))
             StandardInputField(
@@ -88,12 +87,12 @@ fun AddProductScreen(
             StandardInputField(
                 label = "Precio Público",
                 placeholder = "Introduce el precio público",
-                value = viewModel.publicPrice.value,
+                value = viewModel.priceGuest.value,
                 onValueChange = {
-                    viewModel.publicPrice.value = it
-                    viewModel.isPublicPriceTouched.value = true
+                    viewModel.priceGuest.value = it
+                    viewModel.isPriceGuestTouched.value = true
                 },
-                isError = !viewModel.isPublicPriceValid && viewModel.isPublicPriceTouched.value,
+                isError = !viewModel.isPriceGuestValid && viewModel.isPriceGuestTouched.value,
                 errorMessage = "El precio debe ser un número mayor que 0 ni estar vacío"
             )
 
@@ -102,12 +101,12 @@ fun AddProductScreen(
             StandardInputField(
                 label = "Precio Saguntinos",
                 placeholder = "Introduce el precio para Saguntinos",
-                value = viewModel.privatePrice.value,
+                value = viewModel.priceMember.value,
                 onValueChange = {
-                    viewModel.privatePrice.value = it
-                    viewModel.isPrivatePriceTouched.value = true
+                    viewModel.priceMember.value = it
+                    viewModel.isPriceMemberTouched.value = true
                 },
-                isError = !viewModel.isPrivatePriceValid && viewModel.isPrivatePriceTouched.value,
+                isError = !viewModel.isPriceMemberValid && viewModel.isPriceMemberTouched.value,
                 errorMessage = "El precio debe ser un número mayor que 0 ni estar vacío"
             )
 

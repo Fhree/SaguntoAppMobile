@@ -51,7 +51,10 @@ fun StandardInputField(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 errorIndicatorColor = Color.Transparent,
-                errorContainerColor = InputBg
+                errorContainerColor = InputBg,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.DarkGray,
+                cursorColor = Color.Black
             ),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth().then(

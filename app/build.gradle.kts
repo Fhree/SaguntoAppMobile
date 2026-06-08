@@ -24,7 +24,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         val envBaseUrl = System.getenv("API_BASE_URL")//Producción
@@ -37,6 +36,7 @@ android {
         val localBaseUrl = properties.getProperty("API_BASE_URL")
 
         val baseUrl = envBaseUrl ?: localBaseUrl
+        //buildConfigField("String", "API_BASE_URL", if (baseUrl != null) "\"$baseUrl\"" else "\"http://192.168.1.123:7010/\"")
         buildConfigField("String", "API_BASE_URL", if (baseUrl != null) "\"$baseUrl\"" else "\"http://10.0.2.2:7010/\"")
     }
 
@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons.core)
 
     // Inyección de dependencias (Koin)
     implementation(libs.koin.androidx.compose)
@@ -85,6 +86,8 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.foundation.layout)
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+    implementation(libs.androidx.material3)
 
     // Testing
     testImplementation(libs.junit)

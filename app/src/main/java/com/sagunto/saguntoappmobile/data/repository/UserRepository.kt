@@ -2,9 +2,11 @@ package com.sagunto.saguntoappmobile.data.repository
 
 import android.util.Log
 import com.sagunto.saguntoappmobile.data.network.dto.createUser.*
+import com.sagunto.saguntoappmobile.data.network.dto.getUserByNameOrSaguntinoCode.GetUserByNameOrSaguntinoCodeResponse
 import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -26,11 +28,47 @@ class UserRepository (
                 val responseData = response.body<CreateUserResponse>()
                 Result.success(responseData)
             } else {
-                Result.failure(Exception("Fallo en la API. Código HTTP: ${response.status.value}"))
+                Result.failure(Exception("Fallo en la API add_User. Código HTTP: ${response.status.value}"))
             }
 
         } catch (e: Exception) {
-            Log.e("API_ERROR", "💥 Ha fallado la petición HTTP", e)
+            Log.e("API_ERROR_ADD_USER", "💥 Ha fallado la petición HTTP", e)
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun getUserBySaguntinoCode(code: String): Result<List<GetUserByNameOrSaguntinoCodeResponse>> {
+        return try{
+            val response = httpClient.get("api/users/saguntino_code/${code}") {
+                contentType(ContentType.Application.Json)
+            }
+
+            if(response.status.isSuccess()){
+                val responseData = response.body<List<GetUserByNameOrSaguntinoCodeResponse>>()
+                Result.success(responseData)
+            }else{
+                Result.failure(Exception("Fallo en la API get_User. Código HTTP: ${response.status.value}"))
+            }
+        }catch (e: Exception) {
+            Log.e("API_ERROR_GET_USER", "💥 Ha fallado la petición HTTP", e)
+            return Result.failure(e)
+        }
+    }
+
+    override suspend fun getUserByName(name: String): Result<List<GetUserByNameOrSaguntinoCodeResponse>> {
+        return try{
+            val response = httpClient.get("api/users/name/${name}") {
+                contentType(ContentType.Application.Json)
+            }
+
+            if(response.status.isSuccess()){
+                val responseData = response.body<List<GetUserByNameOrSaguntinoCodeResponse>>()
+                Result.success(responseData)
+            }else{
+                Result.failure(Exception("Fallo en la API get_User. Código HTTP: ${response.status.value}"))
+            }
+        }catch (e: Exception) {
+            Log.e("API_ERROR_GET_USER", "💥 Ha fallado la petición HTTP", e)
             return Result.failure(e)
         }
     }

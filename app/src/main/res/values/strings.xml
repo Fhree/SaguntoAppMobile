@@ -19,5 +19,9 @@
     <string name="txt_product">Producto</string>
     <string name="btn_addProducts">Añadir producto</string>
     <string name="btn_addUser">Añadir usuario</string>
-    <string name="btn_goBackToMenu">Volver al menu</string>"
+    <string name="btn_goBackToMenu">Volver al menu</string>
+    <string name="createOrderTitle">CREAR CONSUMICIÓN</string>
+    <string name="txtBox_saguntino_code_placeholder">Introduce el código del Saguntino</string>
+    <string name="txtBox_saguntino_code_label">Código Saguntino</string>
+    <string name="selectCustomerTypeTitle">Selecciona tipo de cliente</string>"
 </resources>

@@ -27,7 +27,7 @@ val LightBlueIconBg = Color(0xFFE3F2FD)
 
 @Composable
 fun MainMenuScreen(
-    onClickNavToAddOrder: () -> Unit,
+    onClickNavToSelectCustomerType: () -> Unit,
     onClickNavToPayment: () -> Unit,
     onClickNavToAddProduct: () -> Unit,
     onClickNavToCheckStatistics: () -> Unit,
@@ -54,7 +54,7 @@ fun MainMenuScreen(
             iconResId = R.drawable.add_order,
             iconTint = Color.Green,
             iconBgColor = LightGreenIconBg,
-            onClick = { onClickNavToAddOrder() }
+            onClick = { onClickNavToSelectCustomerType() }
         )
 
         MenuOptionCard(
