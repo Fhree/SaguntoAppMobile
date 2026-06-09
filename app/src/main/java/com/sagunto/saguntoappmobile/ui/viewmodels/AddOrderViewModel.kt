@@ -19,6 +19,8 @@ class AddOrderViewModel(
    private val productRepository: IProductRepository,
    private val customerId: Int
 ): ViewModel() {
+
+    val isSaguntino : String =  if (customerId == 1) "Precio Saguntino" else "Precio Cliente"
     private val _isLoading = MutableStateFlow(false)
     private val _showCodeDialog = MutableStateFlow(false)
     val showCodeDialog: StateFlow<Boolean> = _showCodeDialog.asStateFlow()

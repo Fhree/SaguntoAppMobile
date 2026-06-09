@@ -6,5 +6,5 @@ import com.sagunto.saguntoappmobile.data.network.dto.getUserByNameOrSaguntinoCod
 interface IUserRepository {
     suspend fun addUser(user: CreateUserRequest): Result<CreateUserResponse>
     suspend fun getUserByName(name: String): Result<List<GetUserByNameOrSaguntinoCodeResponse>>
-    suspend fun getUserBySaguntinoCode(code: String): Result<List<GetUserByNameOrSaguntinoCodeResponse>>
+    suspend fun getUserBySaguntinoCode(code: String): Result<GetUserByNameOrSaguntinoCodeResponse>
 }

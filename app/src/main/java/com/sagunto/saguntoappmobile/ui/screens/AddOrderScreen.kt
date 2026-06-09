@@ -56,11 +56,12 @@ fun AddOrderScreen(
     var isDropdownExpanded by remember { mutableStateOf(false) }
     val totalPrice = cartItems.sumOf { it.priceSnapshot * it.quantity }
 
+
     Scaffold(
         topBar = {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                title = { Text("Añadir consumición") },
+                title = { Text("Añadir consumición - ${viewModel.isSaguntino}" ) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(

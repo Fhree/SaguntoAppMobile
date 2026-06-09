@@ -100,7 +100,9 @@ fun SelectCustomerTypeScreen(
                 iconResId = R.drawable.add_order,
                 iconTint = MaterialTheme.colorScheme.tertiary,
                 iconBgColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                onClick = { viewModel.searchUsers() }
+                onClick = {
+                    viewModel.searchUsers { userId -> onClickToAddOrder(userId) }
+                }
             )
             Spacer(modifier = Modifier.height(SaguntoSpacing.itemSpacing))
             MenuOptionCard(

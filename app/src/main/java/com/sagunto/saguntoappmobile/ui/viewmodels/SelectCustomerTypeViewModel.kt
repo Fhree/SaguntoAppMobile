@@ -30,37 +30,51 @@ class SelectCustomerTypeViewModel(
     val isSaguntinoCodeValid: Boolean = false
     val isSaguntinoCodeTouched: Boolean = false
 
-    fun searchUsers(){
+    fun searchUsers(onNavigateToOrder: (Int) -> Unit) {
         val currentQuery = _searchQuery.value.trim()
         if (currentQuery.isEmpty()) return
 
+        if (saguntinoCodeRegex.matches(currentQuery)) {
+            searchUserBySaguntinoCode(currentQuery, onNavigateToOrder)
+        } else {
+            searchUsersByName(currentQuery)
+        }
+    }
+
+    private fun searchUserBySaguntinoCode(code: String, onNavigateToOrder: (Int) -> Unit) {
         viewModelScope.launch {
-
-            val result: Result<List<GetUserByNameOrSaguntinoCodeResponse>>
-
-            if(saguntinoCodeRegex.matches(currentQuery))
-                result = repository.getUserBySaguntinoCode(currentQuery)
-            else
-                result = repository.getUserByName(currentQuery)
-
-            result.fold(
-                onSuccess = {
-                    if(it.isEmpty()) {
-                        _messageDialog.value = "No existe usuario con ese nombre o código"
-                        _searchResults.value = emptyList()
-                    }else {
-                        _messageDialog.value = "Seleccione al saguntino"
-                        _searchResults.value = it
-                    }
-
-                    _showDialog.value = true
+            repository.getUserBySaguntinoCode(code).fold(
+                onSuccess = { user ->
+                    onNavigateToOrder(user.id)
                 },
                 onFailure = {
-                    _messageDialog.value = "No existe usuario con ese nombre o código"
+                    _messageDialog.value = "No existe ningún saguntino con ese código"
+                    _searchResults.value = emptyList()
                     _showDialog.value = true
                 }
             )
+        }
+    }
 
+    private fun searchUsersByName(name: String) {
+        viewModelScope.launch {
+            repository.getUserByName(name).fold(
+                onSuccess = { users ->
+                    if (users.isEmpty()) {
+                        _messageDialog.value = "No existe ningún usuario con ese nombre"
+                        _searchResults.value = emptyList()
+                    } else {
+                        _messageDialog.value = "Seleccione al saguntino"
+                        _searchResults.value = users
+                    }
+                    _showDialog.value = true
+                },
+                onFailure = {
+                    _messageDialog.value = "Error al buscar el nombre en el servidor"
+                    _searchResults.value = emptyList()
+                    _showDialog.value = true
+                }
+            )
         }
     }
 

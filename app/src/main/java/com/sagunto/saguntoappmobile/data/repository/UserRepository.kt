@@ -37,14 +37,14 @@ class UserRepository (
         }
     }
 
-    override suspend fun getUserBySaguntinoCode(code: String): Result<List<GetUserByNameOrSaguntinoCodeResponse>> {
+    override suspend fun getUserBySaguntinoCode(code: String): Result<GetUserByNameOrSaguntinoCodeResponse> {
         return try{
             val response = httpClient.get("api/users/saguntino_code/${code}") {
                 contentType(ContentType.Application.Json)
             }
 
             if(response.status.isSuccess()){
-                val responseData = response.body<List<GetUserByNameOrSaguntinoCodeResponse>>()
+                val responseData = response.body<GetUserByNameOrSaguntinoCodeResponse>()
                 Result.success(responseData)
             }else{
                 Result.failure(Exception("Fallo en la API get_User. Código HTTP: ${response.status.value}"))
