@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 // Paleta base sugerida
 val SaguntoBackground = Color(0xFF9AD99A)
-val SaguntoDarkGreen = Color(0xFF0F2617)
+val SaguntoDarkGreen = Color(0xFF16291F)
 val SaguntoNeonGreen = Color(0xFF8CE03A)
 val SaguntoTextGray = Color(0xFFA0B3A6)
 val SaguntoErrorRed = Color(0xFFC49C96)
