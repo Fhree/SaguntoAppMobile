@@ -1,119 +1,129 @@
 package com.sagunto.saguntoappmobile.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import com.sagunto.saguntoappmobile.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-// Custom Colors
-val DarkGreenBg = Color(0xFF16291F)
-val LimeGreen = Color(0xff9ad99a)
-val ButtonText = Color(0xFF0B2918)
-val InputBg = Color(0xFFF2F2F2)
+import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
+fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize()
-        .background(DarkGreenBg)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary) // Verde oscuro de fondo
+            .padding(SaguntoSpacing.screenHorizontalPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
+        // Logo
         Box(
             modifier = Modifier
-                .align(Alignment.BottomEnd) // Paso 1: Lo anclamos a la esquina inferior derecha
-                .offset(x = 150.dp, y = 180.dp) // Paso 2: Lo empujamos fuera de la pantalla por la mitad de su tamaño
-                .requiredSize(650.dp),
+                .size(120.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface),
             contentAlignment = Alignment.Center
-
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.login_image_sagunto),
-                contentDescription = "Decoración de fondo", // Descripciones claras para accesibilidad
-                modifier = Modifier.fillMaxSize()
+            Icon(
+                Icons.Default.Star, 
+                contentDescription = "Logo", 
+                modifier = Modifier.size(60.dp), 
+                tint = MaterialTheme.colorScheme.primary
             )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+        Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
+
+        Text(
+            "Bienvenido", 
+            color = MaterialTheme.colorScheme.onPrimary, 
+            fontSize = 28.sp, 
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            "Gestión de bar profesional", 
+            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f), 
+            fontSize = 16.sp
+        )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        // Inputs
+        LoginLabel("USUARIO")
+        TextField(
+            value = username,
+            onValueChange = { username = it },
+            placeholder = { Text("Introduce tu usuario") },
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
+
+        LoginLabel("CONTRASEÑA")
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            placeholder = { Text("........") },
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+            visualTransformation = PasswordVisualTransformation(),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
+
+        // Button
+        Button(
+            onClick = onLoginSuccess,
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth().height(55.dp)
         ) {
-            Spacer(modifier = Modifier.height(120.dp))
-            LoginLabel(stringResource(R.string.loginLabel_user))
-            TextField(
-                value = username,
-                onValueChange = { username = it },
-                placeholder = { Text(stringResource(R.string.txtBox_user_placeholder)) },
-                leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = InputBg,
-                    unfocusedContainerColor = InputBg,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth()
+            Text(
+                "Acceder", 
+                color = MaterialTheme.colorScheme.primary, 
+                fontSize = 18.sp, 
+                fontWeight = FontWeight.Bold
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-            LoginLabel(stringResource(R.string.loginLabel_password))
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                placeholder = { Text("........") },
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
-                visualTransformation = PasswordVisualTransformation(),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = InputBg,
-                    unfocusedContainerColor = InputBg,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth()
+            Spacer(modifier = Modifier.width(SaguntoSpacing.small))
+            Icon(
+                Icons.Default.ArrowForward, 
+                contentDescription = null, 
+                tint = MaterialTheme.colorScheme.primary
             )
-
-            Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                onClick = { onLoginSuccess() },
-                colors = ButtonDefaults.buttonColors(containerColor = LimeGreen),
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier.fillMaxWidth().height(55.dp)
-            ) {
-                Text(
-                    stringResource(R.string.btn_log_in),
-                    color = ButtonText,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = null,
-                    tint = ButtonText
-                )
-            }
         }
     }
 }
@@ -122,15 +132,9 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 fun LoginLabel(text: String) {
     Text(
         text = text,
-        color = Color.LightGray,
+        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, start = 4.dp)
+        modifier = Modifier.fillMaxWidth().padding(bottom = SaguntoSpacing.small, start = 4.dp)
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginPreview() {
-    LoginScreen(onLoginSuccess = {})
 }

@@ -18,9 +18,12 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -33,15 +36,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.sagunto.saguntoappmobile.R
-import com.sagunto.saguntoappmobile.domain.models.Product
 import com.sagunto.saguntoappmobile.ui.components.ProductCard
+import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,14 +51,6 @@ fun AddOrderScreen(
     navController: NavHostController,
     viewModel: AddOrderViewModel,
 ) {
-    // Puedes borrar la variable productTest si ya no la usas para maquetar
-    val productTest = Product(
-        id = 1,
-        name = "Coca-Cola",
-        publicPrice = 1.5,
-        privatePrice = 1.0
-    )
-
     val productCatalog by viewModel.productCatalog.collectAsState()
     val cartItems by viewModel.cart.collectAsState()
     var isDropdownExpanded by remember { mutableStateOf(false) }
@@ -77,7 +70,9 @@ fun AddOrderScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF9AD99A)
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
@@ -85,10 +80,9 @@ fun AddOrderScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF9AD99A))
-                    .padding(horizontal = 24.dp, vertical = 16.dp) // <-- APLICADO AQUÍ TAMBIÉN PARA QUE ALINEE
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = SaguntoSpacing.screenHorizontalPadding, vertical = SaguntoSpacing.cardPadding)
             ) {
-                // --- TEXTO DEL TOTAL ---
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -96,25 +90,22 @@ fun AddOrderScreen(
                 ) {
                     Text(
                         text = "TOTAL:",
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+                        fontWeight = FontWeight.Black,
                         fontSize = 20.sp,
-                        color = Color(0xFF0F2617) // Verde muy oscuro
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
                         text = "${"%.2f".format(totalPrice)} €",
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+                        fontWeight = FontWeight.Black,
                         fontSize = 24.sp,
-                        color = Color(0xFF0F2617)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
 
-                // --- BOTÓN DE CREAR PEDIDO ORIGINAL ---
                 Button(
-                    onClick = {
-                        viewModel.saveOrder()
-                    },
+                    onClick = { viewModel.saveOrder() },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = cartItems.isNotEmpty()
                 ) {
@@ -126,31 +117,28 @@ fun AddOrderScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(Color(0xff9ad99a))
-                .padding(horizontal = 24.dp, vertical = 8.dp), // <-- AQUÍ ESTÁ EL PADDING HOMOGÉNEO
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = SaguntoSpacing.screenHorizontalPadding, vertical = SaguntoSpacing.small),
             horizontalAlignment = Alignment.CenterHorizontally,
-            // Quitamos el verticalArrangement = Arrangement.Center para que la lista empiece arriba
         ) {
             ExposedDropdownMenuBox(
                 expanded = isDropdownExpanded,
                 onExpandedChange = { isDropdownExpanded = it },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // El campo de texto que sirve de "botón" para abrir el menú
                 OutlinedTextField(
-                    value = "Seleccionar producto...", // Texto estático
+                    value = "Seleccionar producto...",
                     onValueChange = {},
-                    readOnly = true, // Evita que el teclado se abra
+                    readOnly = true,
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
                     },
                     modifier = Modifier
-                        .menuAnchor() // CRÍTICO: Ancla el menú a este TextField
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth(),
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                    colors = OutlinedTextFieldDefaults.colors()
                 )
 
-                // La lista desplegable en sí
                 ExposedDropdownMenu(
                     expanded = isDropdownExpanded,
                     onDismissRequest = { isDropdownExpanded = false }
@@ -169,15 +157,12 @@ fun AddOrderScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(SaguntoSpacing.large))
 
-            // 4. Zona reservada para la lista del carrito (donde irán las ProductCard)
-            // Quitamos padding horizontal de las tarjetas para que no se sume al de la pantalla
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(cartItems) { item ->
-                    // Envolvemos la tarjeta en un Box o Column sin padding lateral extra
                     ProductCard(
                         name = item.name,
                         price = item.priceSnapshot,

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,30 +29,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.vectorResource
-import com.sagunto.saguntoappmobile.ui.screens.DarkGreenBg
+import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 
 @Composable
 fun MenuOptionCard(
     title: String,
     subtitle: String,
     iconResId: Int,
-    iconTint: Color,
+    iconTint: Color, // Se puede mantener si los iconos tienen colores específicos, o usar MaterialTheme
     iconBgColor: Color,
     onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xff9ad99a))
-            .padding(vertical = 8.dp)
+            .padding(vertical = SaguntoSpacing.small)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(2.dp, Color(0xff069435))
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(SaguntoSpacing.cardPadding)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -67,18 +67,18 @@ fun MenuOptionCard(
                     tint = Color.Unspecified)
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(SaguntoSpacing.medium))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    color = DarkGreenBg,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = subtitle,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.secondary,
                     fontSize = 14.sp
                 )
             }
@@ -86,7 +86,7 @@ fun MenuOptionCard(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Ir",
-                tint = Color.LightGray
+                tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
             )
         }
     }

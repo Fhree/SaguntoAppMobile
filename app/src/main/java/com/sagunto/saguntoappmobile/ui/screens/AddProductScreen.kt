@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -23,13 +24,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.sagunto.saguntoappmobile.R
 import com.sagunto.saguntoappmobile.ui.components.StandardInputField
+import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +51,8 @@ fun AddProductScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(modifier = Modifier.fillMaxWidth(),
+            TopAppBar(
+                modifier = Modifier.fillMaxWidth(),
                 title = { Text("Añadir producto") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -62,14 +63,22 @@ fun AddProductScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF9AD99A)))
-        }) {paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)
-            .fillMaxSize()
-            .background(Color(0xff9ad99a))
-            ) {
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                )
+            )
+        }) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = SaguntoSpacing.screenHorizontalPadding)
+        ) {
 
-            Spacer(modifier = Modifier.height(150.dp))
+            Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
+            
             StandardInputField(
                 label = "Nombre",
                 placeholder = "Introduce el nombre del producto",
@@ -82,7 +91,7 @@ fun AddProductScreen(
                 errorMessage = "El nombre es obligatorio"
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
 
             StandardInputField(
                 label = "Precio Público",
@@ -96,7 +105,7 @@ fun AddProductScreen(
                 errorMessage = "El precio debe ser un número mayor que 0 ni estar vacío"
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
 
             StandardInputField(
                 label = "Precio Saguntinos",
@@ -110,11 +119,16 @@ fun AddProductScreen(
                 errorMessage = "El precio debe ser un número mayor que 0 ni estar vacío"
             )
 
-            Spacer(modifier = Modifier.height(100.dp))
-            Row(modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End){
-                Button(onClick = { viewModel.saveProduct() },
-                    enabled = viewModel.isFormValid) {
+            Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    onClick = { viewModel.saveProduct() },
+                    enabled = viewModel.isFormValid
+                ) {
                     Text(stringResource(R.string.btn_addProducts))
                 }
             }

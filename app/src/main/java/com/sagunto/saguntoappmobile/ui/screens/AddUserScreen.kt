@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -26,13 +27,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.sagunto.saguntoappmobile.R
 import com.sagunto.saguntoappmobile.ui.components.StandardInputField
+import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +47,6 @@ fun AddUserScreen(
 
     val context = LocalContext.current
 
-    //toast de respuesta negativa
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -75,7 +75,8 @@ fun AddUserScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(modifier = Modifier.fillMaxWidth(),
+            TopAppBar(
+                modifier = Modifier.fillMaxWidth(),
                 title = { Text("Añadir Saguntino") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -86,14 +87,21 @@ fun AddUserScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF9AD99A)))
-        }) {
-        Column(modifier = Modifier
-            .background(Color(0xff9ad99a))
-            .padding(16.dp)
-            .fillMaxSize())
-        {
-            Spacer(modifier = Modifier.height(150.dp))
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                )
+            )
+        }) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = SaguntoSpacing.screenHorizontalPadding)
+        ) {
+            Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
+            
             StandardInputField(
                 label = "Nombre",
                 placeholder = "Introduce el nombre del saguntino",
@@ -106,7 +114,8 @@ fun AddUserScreen(
                 errorMessage = "El nombre es obligatorio"
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
+            
             StandardInputField(
                 label = "Apellidos",
                 placeholder = "Introduce los apellidos del saguntino",
@@ -115,14 +124,20 @@ fun AddUserScreen(
                     viewModel.surname.value = it
                     viewModel.isSurnameTouched.value = true
                 },
-                isError = !viewModel.isNameValid && viewModel.isNameTouched.value,
+                isError = !viewModel.isSurnameValid && viewModel.isSurnameTouched.value,
                 errorMessage = "Los apellidos son obligatorios"
             )
 
-            Row(modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End){
-                Button(onClick = { viewModel.saveUser() },
-                    enabled = viewModel.isFormValid) {
+            Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    onClick = { viewModel.saveUser() },
+                    enabled = viewModel.isFormValid
+                ) {
                     Text(stringResource(R.string.btn_addUser))
                 }
             }

@@ -1,7 +1,9 @@
 package com.sagunto.saguntoappmobile.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -10,13 +12,16 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun CheckStatisticsScreen() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Estás en estadisticas", fontSize = 24.sp)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Estás en estadísticas",
+            fontSize = 24.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
-
-// Crea también estos archivos siguiendo la misma estructura:
-// - PayOrderScreen.kt ("Estás en Cobrar")
-// - AddProductScreen.kt ("Estás en Añadir Producto")
-// - CheckConsumptionScreen.kt ("Estás en Comprobar Consumo")
-// - AddSaguntinoScreen.kt ("Estás en Añadir Saguntino")

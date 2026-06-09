@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,7 +31,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,9 +38,8 @@ import androidx.navigation.NavHostController
 import com.sagunto.saguntoappmobile.R
 import com.sagunto.saguntoappmobile.ui.components.MenuOptionCard
 import com.sagunto.saguntoappmobile.ui.components.StandardInputField
+import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
-
-// Pantalla pensada para elegir si un cliente es saguntino o no
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +66,11 @@ fun SelectCustomerTypeScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF9AD99A))
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                )
             )
         }
     ) { paddingValues ->
@@ -75,37 +78,37 @@ fun SelectCustomerTypeScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .background(Color(0xff9ad99a))
-                .padding(horizontal = 24.dp), // <-- AQUÍ ESTÁ EL PADDING HOMOGÉNEO APLICADO
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = SaguntoSpacing.screenHorizontalPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center // Aquí sí lo mantenemos porque no hay listas que crezcan
+            verticalArrangement = Arrangement.Center
         ) {
             StandardInputField(
                 label = stringResource(R.string.txtBox_saguntino_code_label),
                 placeholder = stringResource(R.string.txtBox_saguntino_code_placeholder),
                 value = searchQuery,
-                onValueChange = {nuevoTexto ->
+                onValueChange = { nuevoTexto ->
                     viewModel.updateSearchQuery(nuevoTexto)
                 },
                 isError = !viewModel.isSaguntinoCodeValid && viewModel.isSaguntinoCodeTouched,
                 errorMessage = "El nombre es obligatorio"
             )
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(SaguntoSpacing.itemSpacing))
             MenuOptionCard(
                 title = "SAGUNTINO",
                 subtitle = "Crear pedidos para Saguntinos",
                 iconResId = R.drawable.add_order,
-                iconTint = Color.Green,
-                iconBgColor = Color(0xFFE8F5E9),
-                onClick = { viewModel.searchUsers() } //Seguramente este sea el botón "lupa"
+                iconTint = MaterialTheme.colorScheme.tertiary,
+                iconBgColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
+                onClick = { viewModel.searchUsers() }
             )
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(SaguntoSpacing.itemSpacing))
             MenuOptionCard(
                 title = "NO SAGUNTINO",
                 subtitle = "Crear pedidos para invitados",
                 iconResId = R.drawable.payment,
-                iconTint = Color.Blue,
-                iconBgColor = Color(0xFFE3F2FD),
+                iconTint = MaterialTheme.colorScheme.primary,
+                iconBgColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
                 onClick = { onClickToAddOrder(-1) }
             )
         }
@@ -125,9 +128,13 @@ fun SelectCustomerTypeScreen(
                                     viewModel.dismissDialog()
                                     onClickToAddOrder(user.id)
                                 }
-                                .padding(16.dp)
+                                .padding(SaguntoSpacing.medium)
                         ) {
-                            Text(text = "${user.name} ${user.surname}", fontSize = 18.sp)
+                            Text(
+                                text = "${user.name} ${user.surname}",
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
                         }
                         HorizontalDivider()
                     }
