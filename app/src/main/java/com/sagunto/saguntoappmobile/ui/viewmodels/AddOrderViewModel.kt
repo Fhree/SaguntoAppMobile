@@ -1,6 +1,5 @@
 package com.sagunto.saguntoappmobile.ui.viewmodels
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.network.dto.createOrder.CreateOrderRequest
@@ -15,18 +14,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AddOrderViewModel(
-   private val orderRepository: IOrderRepository,
-   private val productRepository: IProductRepository,
-   private val customerId: Int
+    private val orderRepository: IOrderRepository,
+    private val productRepository: IProductRepository,
+    private val customerId: Int
 ): ViewModel() {
 
-    val isSaguntino : String =  if (customerId == 1) "Precio Saguntino" else "Precio Cliente"
+    val isSaguntino : Boolean = customerId > 0
+
     private val _isLoading = MutableStateFlow(false)
-    private val _showCodeDialog = MutableStateFlow(false)
-    val showCodeDialog: StateFlow<Boolean> = _showCodeDialog.asStateFlow()
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    // 🛠️ FIX: Renombrado a algo semántico y añadido el estado de éxito/error
+    private val _showResultDialog = MutableStateFlow(false)
+    val showResultDialog: StateFlow<Boolean> = _showResultDialog.asStateFlow()
+
+    private val _isOrderSuccess = MutableStateFlow<Boolean?>(null)
+    val isOrderSuccess: StateFlow<Boolean?> = _isOrderSuccess.asStateFlow()
+
     private val _messageDialog = MutableStateFlow("")
     val messageDialog: StateFlow<String> = _messageDialog.asStateFlow()
-
 
     private val _cart = MutableStateFlow<List<OrderLineRequest>>(emptyList())
     val cart: StateFlow<List<OrderLineRequest>> = _cart.asStateFlow()
@@ -34,9 +40,7 @@ class AddOrderViewModel(
     private val _productCatalog = MutableStateFlow<List<GetProductsByCustomerId>>(emptyList())
     val productCatalog: StateFlow<List<GetProductsByCustomerId>> = _productCatalog.asStateFlow()
 
-
-
-    init { //Como en angular, para la ejecución en el momento de su creación
+    init {
         getProducts()
     }
 
@@ -57,7 +61,6 @@ class AddOrderViewModel(
 
     fun addProductToCart(product: GetProductsByCustomerId) {
         _cart.update { currentCart ->
-
             val newList = currentCart.toMutableList()
             val existingItemIndex = newList.indexOfFirst { it.productId == product.id }
 
@@ -76,7 +79,6 @@ class AddOrderViewModel(
                     )
                 )
             }
-
             newList
         }
     }
@@ -85,13 +87,10 @@ class AddOrderViewModel(
         _cart.update { currentCart ->
             val newList = currentCart.toMutableList()
             val index = newList.indexOfFirst { it.productId == productId }
-
             val existingItem = newList[index]
-
             newList[index] = existingItem.copy(
                 quantity = existingItem.quantity + newQuantity
             )
-
             newList
         }
     }
@@ -99,20 +98,18 @@ class AddOrderViewModel(
     fun deleteProductCart(productId: Int) {
         _cart.update { currentCart ->
             val newList = currentCart.toMutableList()
-
             newList.removeIf { it.productId == productId }
-
             newList
         }
     }
 
-    fun saveOrder(){
+    fun saveOrder(isPaid: Boolean) {
         viewModelScope.launch {
             _isLoading.value = true
 
             val order = CreateOrderRequest(
-                isPaid = false,
-                userId = 1,//TODO aquí tengo qeu sacar el usuario logado
+                isPaid = isPaid,
+                userId = 1, //TODO aquí tengo que sacar el usuario logado
                 customerId = customerId,
                 products = cart.value
             )
@@ -121,12 +118,14 @@ class AddOrderViewModel(
 
             result.fold(
                 onSuccess = {
-                    _messageDialog.value = "Pedido creado con exito!"
-                    _showCodeDialog.value = true
+                    _messageDialog.value = "¡Pedido creado con éxito!"
+                    _isOrderSuccess.value = true // 🛠️ Informamos a la UI del éxito
+                    _showResultDialog.value = true
                 },
                 onFailure = {
                     _messageDialog.value = "El pedido no se ha podido crear, por favor vuelve a intentarlo"
-                    _showCodeDialog.value = true
+                    _isOrderSuccess.value = false // 🛠️ Informamos a la UI del error
+                    _showResultDialog.value = true
                 }
             )
 
@@ -134,8 +133,9 @@ class AddOrderViewModel(
         }
     }
 
-    fun dismissDialog() {
-        _showCodeDialog.value = false
+    fun dismissResultDialog() {
+        _showResultDialog.value = false
         _messageDialog.value = ""
+        _isOrderSuccess.value = null
     }
 }

@@ -13,7 +13,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -26,6 +28,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -38,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sagunto.saguntoappmobile.R
@@ -53,15 +58,23 @@ fun AddOrderScreen(
 ) {
     val productCatalog by viewModel.productCatalog.collectAsState()
     val cartItems by viewModel.cart.collectAsState()
-    var isDropdownExpanded by remember { mutableStateOf(false) }
-    val totalPrice = cartItems.sumOf { it.priceSnapshot * it.quantity }
 
+    // 🛠️ Escuchamos los estados de respuesta del servidor
+    val showResultDialog by viewModel.showResultDialog.collectAsState()
+    val messageDialog by viewModel.messageDialog.collectAsState()
+    val isOrderSuccess by viewModel.isOrderSuccess.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+    var showPaymentDialog by remember { mutableStateOf(false) }
+
+    val totalPrice = cartItems.sumOf { it.priceSnapshot * it.quantity }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                title = { Text("Añadir consumición - ${viewModel.isSaguntino}" ) },
+                title = { Text("Añadir consumición" ) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -106,11 +119,12 @@ fun AddOrderScreen(
                 Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
 
                 Button(
-                    onClick = { viewModel.saveOrder() },
+                    onClick = { showPaymentDialog = true },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = cartItems.isNotEmpty()
+                    // 🛠️ Bloqueamos el botón si la lista está vacía o el servidor está cargando la petición
+                    enabled = cartItems.isNotEmpty() && !isLoading
                 ) {
-                    Text("CREAR PEDIDO")
+                    Text(if (isLoading) "CREANDO..." else "CREAR PEDIDO")
                 }
             }
         }) { paddingValues ->
@@ -131,9 +145,7 @@ fun AddOrderScreen(
                     value = "Seleccionar producto...",
                     onValueChange = {},
                     readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded)
-                    },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded) },
                     modifier = Modifier
                         .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth(),
@@ -146,9 +158,7 @@ fun AddOrderScreen(
                 ) {
                     productCatalog.forEach { product ->
                         DropdownMenuItem(
-                            text = {
-                                Text("${product.name} - ${product.price}€")
-                            },
+                            text = { Text("${product.name} - ${product.price}€") },
                             onClick = {
                                 viewModel.addProductToCart(product)
                                 isDropdownExpanded = false
@@ -168,18 +178,102 @@ fun AddOrderScreen(
                         name = item.name,
                         price = item.priceSnapshot,
                         quantity = item.quantity,
-                        onIncrease = {
-                            viewModel.updateQuantity(productId = item.productId, newQuantity = 1)
-                        },
-                        onDecrease = {
-                            viewModel.updateQuantity(productId = item.productId, newQuantity = -1)
-                        },
-                        onDelete = {
-                            viewModel.deleteProductCart(productId = item.productId)
-                        }
+                        onIncrease = { viewModel.updateQuantity(productId = item.productId, newQuantity = 1) },
+                        onDecrease = { viewModel.updateQuantity(productId = item.productId, newQuantity = -1) },
+                        onDelete = { viewModel.deleteProductCart(productId = item.productId) }
                     )
                 }
             }
         }
+    }
+
+    // --- 1. DIÁLOGOS DE CONFIRMACIÓN DE PAGO (LOCALES) ---
+    if (showPaymentDialog) {
+        if (viewModel.isSaguntino) {
+            AlertDialog(
+                onDismissRequest = { showPaymentDialog = false },
+                title = { Text("Confirmación (Saguntino)") },
+                text = { Text("¿El cliente ha abonado la consumición en este momento?") },
+                confirmButton = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                showPaymentDialog = false
+                                // 🛠️ Solo enviamos a .NET. No navegamos.
+                                viewModel.saveOrder(isPaid = true)
+                            }
+                        ) {
+                            Text("Sí, está pagado")
+                        }
+
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                            onClick = {
+                                showPaymentDialog = false
+                                viewModel.saveOrder(isPaid = false)
+                            }
+                        ) {
+                            Text("No, dejar pendiente")
+                        }
+
+                        TextButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { showPaymentDialog = false }
+                        ) {
+                            Text("Cancelar y seguir editando", textAlign = TextAlign.Center)
+                        }
+                    }
+                }
+            )
+        } else {
+            AlertDialog(
+                onDismissRequest = { showPaymentDialog = false },
+                title = { Text("Confirmación (Invitado)") },
+                text = { Text("Los usuarios no saguntinos deben abonar la consumición en el momento de pedir.\n\n¿Confirmar creación y cobro del pedido?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showPaymentDialog = false
+                            viewModel.saveOrder(isPaid = true)
+                        }
+                    ) {
+                        Text("Confirmar y cobrar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showPaymentDialog = false }) { Text("Cancelar") }
+                }
+            )
+        }
+    }
+
+    // --- 2. DIÁLOGO DE RESULTADO FINAL (REACTIVO DEL SERVIDOR) ---
+    if (showResultDialog) {
+        AlertDialog(
+            // Obligamos al usuario a pulsar el botón para cerrar, no tocando fuera
+            onDismissRequest = {  },
+            title = {
+                Text(if (isOrderSuccess == true) "Operación exitosa" else "Error")
+            },
+            text = { Text(messageDialog) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.dismissResultDialog()
+                        // 🛠️ Solo navegamos si la petición al servidor fue un 200 OK
+                        if (isOrderSuccess == true) {
+                            navController.popBackStack("main_menu", inclusive = false)
+                        }
+                    }
+                ) {
+                    Text("Aceptar")
+                }
+            }
+        )
     }
 }
