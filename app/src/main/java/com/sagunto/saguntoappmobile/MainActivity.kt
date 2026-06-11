@@ -18,8 +18,8 @@ import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
-import com.sagunto.saguntoappmobile.ui.viewmodels.CheckoutViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel = koinViewModel<AddOrderViewModel>(parameters = { parametersOf(id) }))
                         }
                         composable("checkout"){
-                            CheckoutScreen(navController, viewModel = koinViewModel<CheckoutViewModel>())
+                            UnpaidOrderScreen(navController, viewModel = koinViewModel<UnpaidOrderViewModel>())
                         }
                         composable("add_product"){
                             AddProductScreen(navController,viewModel = koinViewModel<AddProductViewModel>())

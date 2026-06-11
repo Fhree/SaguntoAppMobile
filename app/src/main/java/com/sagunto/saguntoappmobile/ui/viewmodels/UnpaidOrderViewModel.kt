@@ -1,6 +1,5 @@
 package com.sagunto.saguntoappmobile.ui.viewmodels
 
-import androidx.compose.ui.text.toUpperCase
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.SearchUsersResponse
@@ -13,9 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private val saguntinoCodeRegex = Regex("^[a-zA-Z]\\d{2}$")
-
-class CheckoutViewModel(
+class UnpaidOrderViewModel(
     private val orderRepository: IOrderRepository,
     private val userRepository: IUserRepository
 ): ViewModel() {
@@ -44,7 +41,6 @@ class CheckoutViewModel(
     private val _isPaymentSuccess = MutableStateFlow<Boolean?>(null)
     val isPaymentSuccess: StateFlow<Boolean?> = _isPaymentSuccess.asStateFlow()
 
-    // Estados para la búsqueda por nombre
     private val _searchResults = MutableStateFlow<List<UserResponse>>(emptyList())
     val searchResults: StateFlow<List<UserResponse>> = _searchResults.asStateFlow()
 

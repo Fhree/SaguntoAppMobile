@@ -15,19 +15,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.sagunto.saguntoappmobile.R
 import com.sagunto.saguntoappmobile.ui.components.StandardInputField
 import com.sagunto.saguntoappmobile.ui.components.UnpaidOrderCard
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
-import com.sagunto.saguntoappmobile.ui.viewmodels.CheckoutViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CheckoutScreen(
+fun UnpaidOrderScreen(
     navController: NavHostController,
-    viewModel: CheckoutViewModel
+    viewModel: UnpaidOrderViewModel
 ) {
     val showResultDialog by viewModel.showResultDialog.collectAsState()
     val messageDialog by viewModel.messageDialog.collectAsState()
@@ -109,7 +108,6 @@ fun CheckoutScreen(
         ) {
             Spacer(modifier = Modifier.height(SaguntoSpacing.small))
 
-            // --- BUSCADOR ---
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -163,7 +161,6 @@ fun CheckoutScreen(
                 Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
 
 
-            // --- LISTADO DE PEDIDOS ---
             if (unpaidOrders.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
@@ -185,7 +182,6 @@ fun CheckoutScreen(
         }
     }
 
-    // --- DIÁLOGO DE CONFIRMACIÓN ---
     if (showConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showConfirmDialog = false },
@@ -207,19 +203,17 @@ fun CheckoutScreen(
         )
     }
 
-    // --- DIÁLOGO DE RESULTADO DEL SERVIDOR ---
     if (showResultDialog) {
         AlertDialog(
             onDismissRequest = { },
-            // title = { Text(if (isPaymentSuccess == true) "Éxito" else "Error") },
-            title = { Text("Información") },
+            title = { Text(if (isPaymentSuccess == true) "Éxito" else "Error") },
             text = { Text(messageDialog) },
             confirmButton = {
                 Button(
                     onClick = {
                         viewModel.dismissResultDialog()
-                        // 🛠️ Aquí añades el if (isPaymentSuccess == true) para volver al menú
-                        // navController.popBackStack("main_menu", inclusive = false)
+                        if (isPaymentSuccess == true)
+                            navController.popBackStack("main_menu", inclusive = false)
                     }
                 ) {
                     Text("Aceptar")
@@ -230,7 +224,7 @@ fun CheckoutScreen(
 
     if (showSearchDialog) {
         AlertDialog(
-        onDismissRequest = { /* Aquí deberías llamar a un método del VM para cerrar, ej: viewModel.dismissSearchDialog() */ },
+        onDismissRequest = { },
             title = { Text("Seleccionar Saguntino") },
             text = {
                 if (searchResults.isEmpty()) {
@@ -257,7 +251,7 @@ fun CheckoutScreen(
                 },
                 confirmButton = {},
                 dismissButton = {
-                    TextButton(onClick = { /* Lógica para cerrar el diálogo */ }) {
+                    TextButton(onClick = { }) {
                         Text("Cancelar")
                     }
                 }

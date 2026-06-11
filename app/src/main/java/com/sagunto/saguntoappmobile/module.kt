@@ -10,7 +10,7 @@ import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
-import com.sagunto.saguntoappmobile.ui.viewmodels.CheckoutViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -31,6 +31,6 @@ val module = module {
     viewModelOf(::AddUserViewModel)
     viewModelOf(::AddOrderViewModel)
     viewModelOf(::SelectCustomerTypeViewModel)
-    viewModelOf(::CheckoutViewModel)
+    viewModelOf(::UnpaidOrderViewModel)
     //viewModelOf(::CheckConsumptionViewModel)
 }

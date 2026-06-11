@@ -78,7 +78,7 @@ class UserRepository (
 
     override suspend fun searchUsers(query: String): SearchUsersResponse {
         if (query.isEmpty()) return SearchUsersResponse.Error("El campo de búsqueda está vacío")
-
+        query.trim()
         return try {
             if (saguntinoCodeRegex.matches(query)) {
                 val response = httpClient.get("api/users/saguntino_code/${query.uppercase()}") {

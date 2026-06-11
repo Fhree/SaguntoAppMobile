@@ -133,7 +133,7 @@ fun SelectCustomerTypeScreen(
                                 .padding(SaguntoSpacing.medium)
                         ) {
                             Text(
-                                text = "${user.name} ${user.surname}",
+                                text = "${user.name} ${user.surname} (${user.saguntinoCode})",
                                 fontSize = 18.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
