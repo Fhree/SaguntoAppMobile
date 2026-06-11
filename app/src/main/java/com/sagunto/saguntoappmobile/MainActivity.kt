@@ -18,6 +18,7 @@ import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.CheckoutViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
                         composable("main_menu") {
                             MainMenuScreen(
                                 onClickNavToSelectCustomerType = {navController.navigate("select_customer_type")},
-                                onClickNavToPayment = {navController.navigate("payment")},
+                                onClickNavToPayment = {navController.navigate("checkout")},
                                 onClickNavToAddProduct = {navController.navigate("add_product")},
                                 onClickNavToCheckStatistics = {navController.navigate("check_statistics")},
                                 onClickNavToAddUser = {navController.navigate("add_user")}
@@ -72,8 +73,8 @@ class MainActivity : ComponentActivity() {
                             AddOrderScreen(navController,
                                 viewModel = koinViewModel<AddOrderViewModel>(parameters = { parametersOf(id) }))
                         }
-                        composable("payment"){
-                            PaymentScreen()
+                        composable("checkout"){
+                            CheckoutScreen(navController, viewModel = koinViewModel<CheckoutViewModel>())
                         }
                         composable("add_product"){
                             AddProductScreen(navController,viewModel = koinViewModel<AddProductViewModel>())

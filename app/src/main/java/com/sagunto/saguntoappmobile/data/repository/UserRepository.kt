@@ -2,7 +2,8 @@ package com.sagunto.saguntoappmobile.data.repository
 
 import android.util.Log
 import com.sagunto.saguntoappmobile.data.network.dto.createUser.*
-import com.sagunto.saguntoappmobile.data.network.dto.getUserByNameOrSaguntinoCode.GetUserByNameOrSaguntinoCodeResponse
+import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.SearchUsersResponse
+import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.UserResponse
 import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -16,6 +17,8 @@ import io.ktor.http.isSuccess
 class UserRepository (
     private val httpClient: HttpClient
 ) : IUserRepository {
+
+    private val saguntinoCodeRegex = Regex("^[a-zA-Z]\\d{2}$")
 
     override suspend fun addUser(user: CreateUserRequest): Result<CreateUserResponse> {
         return try{
@@ -37,14 +40,14 @@ class UserRepository (
         }
     }
 
-    override suspend fun getUserBySaguntinoCode(code: String): Result<GetUserByNameOrSaguntinoCodeResponse> {
+    override suspend fun getUserBySaguntinoCode(code: String): Result<UserResponse> {
         return try{
             val response = httpClient.get("api/users/saguntino_code/${code}") {
                 contentType(ContentType.Application.Json)
             }
 
             if(response.status.isSuccess()){
-                val responseData = response.body<GetUserByNameOrSaguntinoCodeResponse>()
+                val responseData = response.body<UserResponse>()
                 Result.success(responseData)
             }else{
                 Result.failure(Exception("Fallo en la API get_User. Código HTTP: ${response.status.value}"))
@@ -55,14 +58,14 @@ class UserRepository (
         }
     }
 
-    override suspend fun getUserByName(name: String): Result<List<GetUserByNameOrSaguntinoCodeResponse>> {
+    override suspend fun getUserByName(name: String): Result<List<UserResponse>> {
         return try{
             val response = httpClient.get("api/users/name/${name}") {
                 contentType(ContentType.Application.Json)
             }
 
             if(response.status.isSuccess()){
-                val responseData = response.body<List<GetUserByNameOrSaguntinoCodeResponse>>()
+                val responseData = response.body<List<UserResponse>>()
                 Result.success(responseData)
             }else{
                 Result.failure(Exception("Fallo en la API get_User. Código HTTP: ${response.status.value}"))
@@ -70,6 +73,36 @@ class UserRepository (
         }catch (e: Exception) {
             Log.e("API_ERROR_GET_USER", "💥 Ha fallado la petición HTTP", e)
             return Result.failure(e)
+        }
+    }
+
+    override suspend fun searchUsers(query: String): SearchUsersResponse {
+        if (query.isEmpty()) return SearchUsersResponse.Error("El campo de búsqueda está vacío")
+
+        return try {
+            if (saguntinoCodeRegex.matches(query)) {
+                val response = httpClient.get("api/users/saguntino_code/${query.uppercase()}") {
+                    contentType(ContentType.Application.Json)
+                }
+
+                if (response.status.isSuccess())
+                    SearchUsersResponse.SingleResult(response.body())
+                else
+                    SearchUsersResponse.Error("No existe ningún saguntino con ese código")
+
+            } else {
+                val response = httpClient.get("api/users/name/$query") {
+                    contentType(ContentType.Application.Json)
+                }
+
+                if (response.status.isSuccess())
+                    SearchUsersResponse.MultipleResults(response.body())
+                else
+                    SearchUsersResponse.Error("Error al buscar usuarios por nombre en el servidor")
+            }
+        } catch (e: Exception) {
+            Log.e("API_ERROR_GET_USER", "💥 Ha fallado la petición HTTP", e)
+            SearchUsersResponse.Error("Error crítico de conexión: ${e.localizedMessage}")
         }
     }
 }

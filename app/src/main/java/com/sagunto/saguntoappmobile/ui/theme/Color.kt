@@ -7,7 +7,7 @@ val SaguntoBackground = Color(0xFF9AD99A)
 val SaguntoDarkGreen = Color(0xFF16291F)
 val SaguntoNeonGreen = Color(0xFF8CE03A)
 val SaguntoTextGray = Color(0xFFA0B3A6)
-val SaguntoErrorRed = Color(0xFFC49C96)
+val SaguntoErrorRed = Color(0xFFF0373D)
 val SaguntoWhite = Color(0xFFFFFFFF)
 val SaguntoInputBg = Color(0xFFF2F2F2)
 

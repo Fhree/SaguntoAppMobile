@@ -102,7 +102,7 @@ fun AddProductScreen(
                     viewModel.isPriceGuestTouched.value = true
                 },
                 isError = !viewModel.isPriceGuestValid && viewModel.isPriceGuestTouched.value,
-                errorMessage = "El precio debe ser un número mayor que 0 ni estar vacío"
+                errorMessage = "El precio debe ser un número mayor que 0 y no puede estar vacío"
             )
 
             Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
@@ -116,7 +116,7 @@ fun AddProductScreen(
                     viewModel.isPriceMemberTouched.value = true
                 },
                 isError = !viewModel.isPriceMemberValid && viewModel.isPriceMemberTouched.value,
-                errorMessage = "El precio debe ser un número mayor que 0 ni estar vacío"
+                errorMessage = "El precio debe ser un número mayor que 0 y no puede estar vacío"
             )
 
             Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))

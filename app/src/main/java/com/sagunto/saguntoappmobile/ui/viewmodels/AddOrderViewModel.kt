@@ -24,7 +24,6 @@ class AddOrderViewModel(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    // 🛠️ FIX: Renombrado a algo semántico y añadido el estado de éxito/error
     private val _showResultDialog = MutableStateFlow(false)
     val showResultDialog: StateFlow<Boolean> = _showResultDialog.asStateFlow()
 
@@ -49,8 +48,8 @@ class AddOrderViewModel(
             val result = productRepository.getProductsByCustomerId(customerId)
 
             result.fold(
-                onSuccess = { listaProductos ->
-                    _productCatalog.value = listaProductos
+                onSuccess = { productList ->
+                    _productCatalog.value = productList
                 },
                 onFailure = { error ->
                     //TODO

@@ -75,7 +75,6 @@ fun ErrorLabel(text: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.error,
         fontSize = 14.sp,
         fontWeight = FontWeight.Bold,
-        maxLines = 1,
         modifier = modifier.padding(bottom = SaguntoSpacing.small, start = SaguntoSpacing.extraSmall)
     )
 }

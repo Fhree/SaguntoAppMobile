@@ -1,9 +1,8 @@
 package com.sagunto.saguntoappmobile.ui.viewmodels
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sagunto.saguntoappmobile.data.network.dto.getUserByNameOrSaguntinoCode.GetUserByNameOrSaguntinoCodeResponse
+import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.UserResponse
 import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,8 +23,8 @@ class SelectCustomerTypeViewModel(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    private val _searchResults = MutableStateFlow<List<GetUserByNameOrSaguntinoCodeResponse>>(emptyList())
-    val searchResults: StateFlow<List<GetUserByNameOrSaguntinoCodeResponse>> = _searchResults.asStateFlow()
+    private val _searchResults = MutableStateFlow<List<UserResponse>>(emptyList())
+    val searchResults: StateFlow<List<UserResponse>> = _searchResults.asStateFlow()
 
     val isSaguntinoCodeValid: Boolean = false
     val isSaguntinoCodeTouched: Boolean = false

@@ -1,9 +1,9 @@
 package com.sagunto.saguntoappmobile.data.repository
 
 import android.util.Log
-import com.sagunto.saguntoappmobile.domain.models.Product
 import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
 import com.sagunto.saguntoappmobile.data.network.dto.createProduct.CreateProductRequest
+import com.sagunto.saguntoappmobile.data.network.dto.getProducts.GetProductsResponse
 import com.sagunto.saguntoappmobile.data.network.dto.getProductsByCustomerId.GetProductsByCustomerId
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -38,7 +38,7 @@ class ProductRepository(
         }
     }
 
-    override suspend fun getProducts(): Result<List<Product>> {
+    override suspend fun getProducts(): Result<GetProductsResponse> {
         return try{
             val response = httpClient.get("api/products"){
                 contentType(ContentType.Application.Json)
