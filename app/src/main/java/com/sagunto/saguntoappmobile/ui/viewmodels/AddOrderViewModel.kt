@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.network.dto.createOrder.CreateOrderRequest
 import com.sagunto.saguntoappmobile.data.network.dto.createOrder.OrderLineRequest
 import com.sagunto.saguntoappmobile.data.network.dto.getProductsByCustomerId.GetProductsByCustomerId
-import com.sagunto.saguntoappmobile.domain.interfaces.IOrderRepository
-import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IOrderRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IProductRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

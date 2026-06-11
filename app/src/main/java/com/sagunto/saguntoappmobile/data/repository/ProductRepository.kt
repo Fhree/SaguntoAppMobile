@@ -1,7 +1,7 @@
 package com.sagunto.saguntoappmobile.data.repository
 
 import android.util.Log
-import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IProductRepository
 import com.sagunto.saguntoappmobile.data.network.dto.createProduct.CreateProductRequest
 import com.sagunto.saguntoappmobile.data.network.dto.getProducts.GetProductsResponse
 import com.sagunto.saguntoappmobile.data.network.dto.getProductsByCustomerId.GetProductsByCustomerId

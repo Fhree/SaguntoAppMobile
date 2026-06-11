@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.SearchUsersResponse
 import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.UserResponse
 import com.sagunto.saguntoappmobile.data.network.dto.unpaidOrder.UnpaidOrderResponse
-import com.sagunto.saguntoappmobile.domain.interfaces.IOrderRepository
-import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IOrderRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

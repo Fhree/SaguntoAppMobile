@@ -21,21 +21,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sagunto.saguntoappmobile.R
+import com.sagunto.saguntoappmobile.data.repository.AuthRepository
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
+import com.sagunto.saguntoappmobile.ui.viewmodels.LoginViewModel
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun LoginScreen(
+    viewModel: LoginViewModel
+) {
+    val username by viewModel.username.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val loginStatus by viewModel.loginStatus.collectAsState()
 
-    // BOX PRINCIPAL: Necesario para que el caballo se dibuje en el fondo y el formulario encima
     Box(
         modifier = Modifier
             .fillMaxSize()
-            // Se asume que has metido DarkGreenBg en tu Theme como 'background' o 'primary'
             .background(MaterialTheme.colorScheme.primary)
     ) {
-        // --- EL CABALLO HA VUELTO ---
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -50,7 +52,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             )
         }
 
-        // --- FORMULARIO SUPERPUESTO ---
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -63,11 +64,10 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             LoginLabel(stringResource(R.string.loginLabel_user))
             TextField(
                 value = username,
-                onValueChange = { username = it },
+                onValueChange = { newValue -> viewModel.updateUsername(newValue) },
                 placeholder = { Text(stringResource(R.string.txtBox_user_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                 colors = TextFieldDefaults.colors(
-                    // Se asume que tu InputBg antiguo ahora es 'surface'
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                     focusedIndicatorColor = Color.Transparent,
@@ -82,7 +82,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             LoginLabel(stringResource(R.string.loginLabel_password))
             TextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { newValue -> viewModel.updatePassword(newValue) },
                 placeholder = { Text("........") },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 visualTransformation = PasswordVisualTransformation(),
@@ -99,8 +99,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
 
             Button(
-                onClick = { onLoginSuccess() },
-                // Tu 'LimeGreen' original (botón) ha sido mapeado a 'tertiary' o 'secondary' por el agente
+                onClick = { viewModel.loginUser() },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
@@ -109,7 +108,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
             ) {
                 Text(
                     stringResource(R.string.btn_log_in),
-                    // Tu 'ButtonText' original (verde muy oscuro) debe estar en 'onTertiary' o puedes forzar 'primary'
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -121,6 +119,15 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+            loginStatus?.let { status ->
+                Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
+                Text(
+                    text = status,
+                    color = if (status.startsWith("Error")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }
@@ -129,7 +136,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 fun LoginLabel(text: String) {
     Text(
         text = text,
-        // Usamos la opacidad dinámica sobre el color de texto principal del tema
         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
@@ -137,10 +143,4 @@ fun LoginLabel(text: String) {
             .fillMaxWidth()
             .padding(bottom = SaguntoSpacing.small, start = 4.dp)
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginPreview() {
-    LoginScreen(onLoginSuccess = {})
 }

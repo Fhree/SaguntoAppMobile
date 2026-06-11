@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.SearchUsersResponse
 import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.UserResponse
-import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

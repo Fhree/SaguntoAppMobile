@@ -1,4 +1,4 @@
-package com.sagunto.saguntoappmobile.domain.interfaces
+package com.sagunto.saguntoappmobile.data.interfaces
 
 import com.sagunto.saguntoappmobile.data.network.dto.createProduct.CreateProductRequest
 import com.sagunto.saguntoappmobile.data.network.dto.getProducts.GetProductsResponse

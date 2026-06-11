@@ -1,4 +1,4 @@
-package com.sagunto.saguntoappmobile.domain.interfaces
+package com.sagunto.saguntoappmobile.data.interfaces
 
 import com.sagunto.saguntoappmobile.data.network.dto.createOrder.CreateOrderRequest
 import com.sagunto.saguntoappmobile.data.network.dto.unpaidOrder.UnpaidOrderResponse

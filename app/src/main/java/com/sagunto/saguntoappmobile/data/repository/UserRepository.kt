@@ -4,7 +4,7 @@ import android.util.Log
 import com.sagunto.saguntoappmobile.data.network.dto.createUser.*
 import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.SearchUsersResponse
 import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.UserResponse
-import com.sagunto.saguntoappmobile.domain.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

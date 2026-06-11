@@ -3,7 +3,7 @@ package com.sagunto.saguntoappmobile.data.repository
 import android.util.Log
 import com.sagunto.saguntoappmobile.data.network.dto.createOrder.CreateOrderRequest
 import com.sagunto.saguntoappmobile.data.network.dto.unpaidOrder.UnpaidOrderResponse
-import com.sagunto.saguntoappmobile.domain.interfaces.IOrderRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IOrderRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

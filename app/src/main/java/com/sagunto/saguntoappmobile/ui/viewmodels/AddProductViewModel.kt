@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.network.dto.createProduct.CreateProductRequest
-import com.sagunto.saguntoappmobile.domain.interfaces.IProductRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IProductRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow

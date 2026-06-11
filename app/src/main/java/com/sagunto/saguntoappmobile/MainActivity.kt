@@ -7,23 +7,32 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.sagunto.saguntoappmobile.data.repository.AuthRepository
 import com.sagunto.saguntoappmobile.ui.screens.*
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.LoginViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
+import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
+
+    private val authRepository: AuthRepository by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -34,13 +43,24 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+
+                    val currentUser by authRepository.currentUser.collectAsState()
+
+                    LaunchedEffect(currentUser) {
+                        if (currentUser != null) {
+                            navController.navigate("main_menu") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }
+
                     NavHost(navController = navController, startDestination = "login") {
                         composable("login") {
-                            LoginScreen(
-                                onLoginSuccess = {
-                                    navController.navigate("main_menu")
-                                }
-                            )
+                            LoginScreen(viewModel = koinViewModel<LoginViewModel>())
                         }
 
                         composable("main_menu") {
@@ -64,9 +84,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(
                             "add_order/{id}",
-                            arguments = listOf(
-                                navArgument("id") { type = NavType.IntType },
-                            )
+                            arguments = listOf(navArgument("id") { type = NavType.IntType })
                         ){ backStackEntry ->
                             val id = backStackEntry.arguments?.getInt("id") ?: -1
 
