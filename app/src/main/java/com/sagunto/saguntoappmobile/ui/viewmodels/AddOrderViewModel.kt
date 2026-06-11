@@ -118,12 +118,12 @@ class AddOrderViewModel(
             result.fold(
                 onSuccess = {
                     _messageDialog.value = "¡Pedido creado con éxito!"
-                    _isOrderSuccess.value = true // 🛠️ Informamos a la UI del éxito
+                    _isOrderSuccess.value = true
                     _showResultDialog.value = true
                 },
                 onFailure = {
                     _messageDialog.value = "El pedido no se ha podido crear, por favor vuelve a intentarlo"
-                    _isOrderSuccess.value = false // 🛠️ Informamos a la UI del error
+                    _isOrderSuccess.value = false
                     _showResultDialog.value = true
                 }
             )

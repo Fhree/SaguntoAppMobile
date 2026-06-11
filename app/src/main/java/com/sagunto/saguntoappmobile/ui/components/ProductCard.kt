@@ -48,7 +48,6 @@ fun ProductCard(
     ) {
         Column(modifier = Modifier.padding(SaguntoSpacing.cardPadding)) {
 
-            // --- FILA SUPERIOR: Nombre y Precio Unitario ---
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -68,13 +67,11 @@ fun ProductCard(
 
             Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
 
-            // --- FILA INFERIOR: Subtotal, Stepper y Papelera ---
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Lado Izquierdo: Subtotal
                 Text(
                     text = "${"%.2f".format(price * quantity)} €",
                     color = MaterialTheme.colorScheme.onSurface,
@@ -82,11 +79,9 @@ fun ProductCard(
                     fontWeight = FontWeight.Bold
                 )
 
-                // Lado Derecho: Controles agrupados
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Selector de cantidad (Stepper)
                     Row(
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f), RoundedCornerShape(24.dp))
@@ -113,7 +108,6 @@ fun ProductCard(
 
                     Spacer(modifier = Modifier.width(SaguntoSpacing.smallItemSpacing))
 
-                    // Botón de Papelera
                     IconButton(onClick = onDelete) {
                         Icon(
                             imageVector = Icons.Default.Delete,

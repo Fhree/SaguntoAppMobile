@@ -59,7 +59,6 @@ fun AddOrderScreen(
     val productCatalog by viewModel.productCatalog.collectAsState()
     val cartItems by viewModel.cart.collectAsState()
 
-    // 🛠️ Escuchamos los estados de respuesta del servidor
     val showResultDialog by viewModel.showResultDialog.collectAsState()
     val messageDialog by viewModel.messageDialog.collectAsState()
     val isOrderSuccess by viewModel.isOrderSuccess.collectAsState()
@@ -187,7 +186,6 @@ fun AddOrderScreen(
         }
     }
 
-    // --- 1. DIÁLOGOS DE CONFIRMACIÓN DE PAGO (LOCALES) ---
     if (showPaymentDialog) {
         if (viewModel.isSaguntino) {
             AlertDialog(
@@ -252,10 +250,8 @@ fun AddOrderScreen(
         }
     }
 
-    // --- 2. DIÁLOGO DE RESULTADO FINAL (REACTIVO DEL SERVIDOR) ---
     if (showResultDialog) {
         AlertDialog(
-            // Obligamos al usuario a pulsar el botón para cerrar, no tocando fuera
             onDismissRequest = {  },
             title = {
                 Text(if (isOrderSuccess == true) "Operación exitosa" else "Error")
@@ -265,7 +261,6 @@ fun AddOrderScreen(
                 Button(
                     onClick = {
                         viewModel.dismissResultDialog()
-                        // 🛠️ Solo navegamos si la petición al servidor fue un 200 OK
                         if (isOrderSuccess == true) {
                             navController.popBackStack("main_menu", inclusive = false)
                         }

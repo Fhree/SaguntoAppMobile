@@ -36,7 +36,7 @@ fun MenuOptionCard(
     title: String,
     subtitle: String,
     iconResId: Int,
-    iconTint: Color, // Se puede mantener si los iconos tienen colores específicos, o usar MaterialTheme
+    iconTint: Color,
     iconBgColor: Color,
     onClick: () -> Unit
 ) {
