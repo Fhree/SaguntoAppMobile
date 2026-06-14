@@ -14,12 +14,14 @@ import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.LoginViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.SessionViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.UserRegisterViewModel
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
-val module = module {
+val appModule = module {
     // --- CAPA DE RED ---
     single { provideHttpClient() }
 
@@ -36,5 +38,7 @@ val module = module {
     viewModelOf(::AddOrderViewModel)
     viewModelOf(::SelectCustomerTypeViewModel)
     viewModelOf(::UnpaidOrderViewModel)
+    viewModelOf(::SessionViewModel)
+    viewModelOf(::UserRegisterViewModel)
     //viewModelOf(::CheckConsumptionViewModel)
 }

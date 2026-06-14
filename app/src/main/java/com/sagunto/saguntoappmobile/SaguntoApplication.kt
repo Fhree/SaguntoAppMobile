@@ -10,7 +10,7 @@ class SaguntoApplication : Application() {
 
         startKoin {
             androidContext(this@SaguntoApplication)
-            modules(module)
+            modules(appModule)
         }
     }
 }
