@@ -17,17 +17,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sagunto.saguntoappmobile.R
-import com.sagunto.saguntoappmobile.data.repository.AuthRepository
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 import com.sagunto.saguntoappmobile.ui.viewmodels.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
+    onNavigateToRegister: () -> Unit = {}
 ) {
     val username by viewModel.username.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -119,6 +118,18 @@ fun LoginScreen(
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+
+            Spacer(modifier = Modifier.height(SaguntoSpacing.small))
+
+            TextButton(onClick = onNavigateToRegister) {
+                Text(
+                    text = "¿No tienes cuenta? Regístrate aquí",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
             loginStatus?.let { status ->
                 Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
                 Text(

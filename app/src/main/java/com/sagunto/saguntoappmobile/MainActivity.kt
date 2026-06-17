@@ -25,6 +25,7 @@ import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.LoginViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.UserRegisterViewModel
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -51,16 +52,26 @@ class MainActivity : ComponentActivity() {
                             navController.navigate("main_menu") {
                                 popUpTo(0) { inclusive = true }
                             }
-                        } else {
-                            navController.navigate("login") {
-                                popUpTo(0) { inclusive = true }
-                            }
                         }
                     }
 
                     NavHost(navController = navController, startDestination = "login") {
                         composable("login") {
-                            LoginScreen(viewModel = koinViewModel<LoginViewModel>())
+                            LoginScreen(
+                                viewModel = koinViewModel<LoginViewModel>(),
+                                onNavigateToRegister = { navController.navigate("register") }
+                            )
+                        }
+
+                        composable("register") {
+                            UserRegisterScreen(
+                                viewModel = koinViewModel<UserRegisterViewModel>(),
+                                onNavigateToHome = {
+                                    navController.navigate("main_menu") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+                            )
                         }
 
                         composable("main_menu") {
