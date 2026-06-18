@@ -9,7 +9,6 @@ import com.sagunto.saguntoappmobile.data.network.dto.userProfile.UserProfileResp
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -27,11 +26,10 @@ class UserRepository(
     private val _userRole = MutableStateFlow<Int?>(null)
     override val userRole: StateFlow<Int?> = _userRole.asStateFlow()
 
-    override suspend fun fetchUserProfile(jwtToken: String): Result<Unit> {
+    override suspend fun fetchUserProfile(): Result<Unit> {
         return try {
             val response = httpClient.get("api/users/profile") {
                 contentType(ContentType.Application.Json)
-                header("Authorization", "Bearer $jwtToken")
             }
 
             if (response.status.isSuccess()) {
@@ -49,11 +47,10 @@ class UserRepository(
         }
     }
 
-    override suspend fun createUser(user: CreateUserRequest, jwtToken: String): Result<CreateUserResponse> {
+    override suspend fun createUser(user: CreateUserRequest): Result<CreateUserResponse> {
         return try {
             val response = httpClient.post("api/admin/users") {
                 contentType(ContentType.Application.Json)
-                header("Authorization", "Bearer $jwtToken")
                 setBody(user)
             }
 
@@ -68,6 +65,11 @@ class UserRepository(
             Log.e("API_ERROR_ADD_USER", "💥 Ha fallado la petición HTTP", e)
             Result.failure(e)
         }
+    }
+
+    override suspend fun addOfflineUser(user: CreateUserRequest): Result<CreateUserResponse> {
+        // Implementación pendiente o delegada a createUser si el endpoint es el mismo
+        return createUser(user)
     }
 
     override suspend fun getUserBySaguntinoCode(code: String): Result<UserResponse> {
