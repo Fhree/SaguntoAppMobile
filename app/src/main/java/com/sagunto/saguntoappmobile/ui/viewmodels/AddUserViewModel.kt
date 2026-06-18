@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.network.dto.createUser.CreateUserRequest
 import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AddUserViewModel(
-    private val repository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _showCodeDialog = MutableStateFlow(false)
@@ -22,9 +24,9 @@ class AddUserViewModel(
     private val _generatedSaguntinoCode = MutableStateFlow("")
     val generatedSaguntinoCode: StateFlow<String> = _generatedSaguntinoCode.asStateFlow()
 
-
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
+    
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()
 
@@ -35,12 +37,11 @@ class AddUserViewModel(
     var isSurnameTouched = mutableStateOf(false)
 
     val isNameValid: Boolean
-        get() = name.value.isNotBlank() && name.value.isNotEmpty()
+        get() = name.value.isNotBlank()
     val isSurnameValid: Boolean
-        get() = surname.value.isNotBlank() && surname.value.isNotEmpty()
+        get() = surname.value.isNotBlank()
     val isFormValid: Boolean
         get() = isNameValid && isSurnameValid
-
 
     fun saveUser() {
         if(!isFormValid) return
@@ -48,29 +49,34 @@ class AddUserViewModel(
         viewModelScope.launch {
             _isLoading.value = true
 
+            val token = authRepository.getJwtToken()
+            if (token == null) {
+                _uiEvent.emit(UiEvent.ShowToast("Error de sesión: No se pudo obtener el token"))
+                _isLoading.value = false
+                return@launch
+            }
+
             val user = CreateUserRequest(
                 name = name.value,
-                surname = surname.value,
-                roleId = 2 //Role Id basic user
+                surname = surname.value
             )
 
-            val result = repository.addUser(user)
+            val result = userRepository.createUser(user, token)
 
             result.fold(
                 onSuccess = { responseData ->
                     _generatedSaguntinoCode.value = responseData.saguntinoCode
                     _showCodeDialog.value = true
+
+                    name.value = ""
+                    surname.value = ""
+                    isNameTouched.value = false
+                    isSurnameTouched.value = false
                 },
                 onFailure = {
                     _uiEvent.emit(UiEvent.ShowToast("Error al añadir el usuario"))
                 }
             )
-            if (result.isSuccess) {
-                name.value = ""
-                isNameTouched = mutableStateOf(false)
-                surname.value = ""
-                isSurnameTouched = mutableStateOf(false)
-            }
 
             _isLoading.value = false
         }

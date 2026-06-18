@@ -7,7 +7,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.sagunto.saguntoappmobile.ui.viewmodels.RegisterUiState
 import com.sagunto.saguntoappmobile.ui.viewmodels.UserRegisterViewModel
 
 @Composable
@@ -19,14 +18,17 @@ fun UserRegisterScreen(
     val surname by viewModel.surname.collectAsState()
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
-    val uiState by viewModel.uiState.collectAsState()
+
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val successCode by viewModel.successCode.collectAsState()
 
     var showSuccessDialog by remember { mutableStateOf(false) }
     var saguntinoCodeResult by remember { mutableStateOf("") }
 
-    LaunchedEffect(uiState) {
-        if (uiState is RegisterUiState.Success) {
-            saguntinoCodeResult = (uiState as RegisterUiState.Success).saguntinoCode
+    LaunchedEffect(successCode) {
+        if (successCode != null) {
+            saguntinoCodeResult = successCode!!
             showSuccessDialog = true
         }
     }
@@ -75,7 +77,7 @@ fun UserRegisterScreen(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        if (uiState is RegisterUiState.Loading) {
+        if (isLoading) {
             CircularProgressIndicator()
         } else {
             Button(
@@ -86,10 +88,10 @@ fun UserRegisterScreen(
             }
         }
 
-        if (uiState is RegisterUiState.Error) {
+        if (errorMessage != null) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = (uiState as RegisterUiState.Error).message,
+                text = errorMessage!!,
                 color = MaterialTheme.colorScheme.error
             )
         }
@@ -103,6 +105,7 @@ fun UserRegisterScreen(
             confirmButton = {
                 Button(onClick = {
                     showSuccessDialog = false
+                    viewModel.resetSuccessState()
                     onNavigateToHome()
                 }) {
                     Text("Entrar a la app")

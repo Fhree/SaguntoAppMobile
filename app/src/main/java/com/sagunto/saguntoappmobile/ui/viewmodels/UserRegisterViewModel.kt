@@ -2,23 +2,16 @@ package com.sagunto.saguntoappmobile.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.sagunto.saguntoappmobile.data.interfaces.IAuthRepository
 import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
 import com.sagunto.saguntoappmobile.data.network.dto.createUser.CreateUserRequest
-import com.sagunto.saguntoappmobile.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-sealed class RegisterUiState {
-    object Idle : RegisterUiState()
-    object Loading : RegisterUiState()
-    data class Success(val saguntinoCode: String) : RegisterUiState()
-    data class Error(val message: String) : RegisterUiState()
-}
-
 class UserRegisterViewModel(
-    private val authRepository: AuthRepository,
+    private val authRepository: IAuthRepository,
     private val userRepository: IUserRepository
 ) : ViewModel() {
 
@@ -27,16 +20,24 @@ class UserRegisterViewModel(
     val email = MutableStateFlow("")
     val password = MutableStateFlow("")
 
-    private val _uiState = MutableStateFlow<RegisterUiState>(RegisterUiState.Idle)
-    val uiState = _uiState.asStateFlow()
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage = _errorMessage.asStateFlow()
+
+    private val _successCode = MutableStateFlow<String?>(null)
+    val successCode = _successCode.asStateFlow()
 
     fun register() {
         if (name.value.isBlank() || email.value.isBlank() || password.value.isBlank()) {
-            _uiState.value = RegisterUiState.Error("Por favor, rellena los campos obligatorios.")
+            _errorMessage.value = "Por favor, rellena los campos obligatorios."
             return
         }
 
-        _uiState.value = RegisterUiState.Loading
+        _isLoading.value = true
+        _errorMessage.value = null
+
         viewModelScope.launch {
             val authResult = authRepository.registerUser(email.value, password.value)
 
@@ -48,28 +49,34 @@ class UserRegisterViewModel(
                     if (token != null) {
                         val request = CreateUserRequest(
                             name = name.value,
-                            surname = surname.value,
-                            roleId = 2
+                            surname = surname.value
                         )
 
-                        val netResult = userRepository.addUser(request, token)
+                        val netResult = userRepository.createUser(request, token)
 
                         if (netResult.isSuccess) {
                             val code = netResult.getOrNull()?.saguntinoCode ?: "ERROR_CODE"
-                            _uiState.value = RegisterUiState.Success(code)
+                            _successCode.value = code
                             userRepository.fetchUserProfile(token)
                         } else {
-                            _uiState.value = RegisterUiState.Error("Fallo al registrar en el servidor de Sagunto.")
+                            _errorMessage.value = "Fallo al registrar en el servidor de Sagunto."
                         }
                     } else {
-                        _uiState.value = RegisterUiState.Error("No se pudo obtener la credencial de seguridad.")
+                        _errorMessage.value = "No se pudo obtener la credencial de seguridad."
                     }
                 } catch (e: Exception) {
-                    _uiState.value = RegisterUiState.Error(e.message ?: "Error desconocido")
+                    _errorMessage.value = e.message ?: "Error desconocido"
                 }
             } else {
-                _uiState.value = RegisterUiState.Error("Fallo al crear la cuenta. Revisa el correo/contraseña.")
+                _errorMessage.value = "Fallo al crear la cuenta. Revisa el correo/contraseña."
             }
+
+            _isLoading.value = false // Siempre apagamos la carga al terminar
         }
+    }
+
+    // Función útil para limpiar el estado al salir de la pantalla
+    fun resetSuccessState() {
+        _successCode.value = null
     }
 }

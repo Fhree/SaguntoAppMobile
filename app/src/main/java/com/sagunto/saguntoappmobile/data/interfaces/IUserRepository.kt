@@ -10,7 +10,8 @@ interface IUserRepository {
     val userRole: StateFlow<Int?>
 
     suspend fun fetchUserProfile(jwtToken: String): Result<Unit>
-    suspend fun addUser(user: CreateUserRequest, jwtToken: String): Result<CreateUserResponse>
+    suspend fun createUser(user: CreateUserRequest, jwtToken: String): Result<CreateUserResponse>
+    suspend fun addOfflineUser(user: CreateUserRequest, jwtToken: String): Result<CreateUserResponse>
     suspend fun getUserByName(name: String): Result<List<UserResponse>>
     suspend fun getUserBySaguntinoCode(code: String): Result<UserResponse>
     suspend fun searchUsers(query: String): SearchUsersResponse

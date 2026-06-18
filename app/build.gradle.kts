@@ -90,6 +90,11 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+
+    // 🛠️ NUEVO: Plugin de Autenticación de Ktor
+    // ⚠️ RECUERDA: Cambia "AQUI_TU_VERSION" por la versión que uses (ej: "3.0.0" o "2.3.11")
+    implementation("io.ktor:ktor-client-auth:AQUI_TU_VERSION")
+
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.foundation.layout)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")

@@ -16,7 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.sagunto.saguntoappmobile.data.repository.AuthRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IAuthRepository
 import com.sagunto.saguntoappmobile.ui.screens.*
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
@@ -26,13 +26,13 @@ import com.sagunto.saguntoappmobile.ui.viewmodels.LoginViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UserRegisterViewModel
-import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
-    private val authRepository: AuthRepository by inject()
+    private val authRepository: IAuthRepository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +80,14 @@ class MainActivity : ComponentActivity() {
                                 onClickNavToPayment = {navController.navigate("checkout")},
                                 onClickNavToAddProduct = {navController.navigate("add_product")},
                                 onClickNavToCheckStatistics = {navController.navigate("check_statistics")},
-                                onClickNavToAddUser = {navController.navigate("add_user")}
+                                onClickNavToAddUser = {navController.navigate("add_user")},
+                                onClickLogout = {
+                                    authRepository.logout()
+
+                                    navController.navigate("login") {
+                                        popUpTo(0) { inclusive = true }
+                                    }
+                                }
                             )
                         }
 

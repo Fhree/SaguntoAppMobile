@@ -1,5 +1,6 @@
 package com.sagunto.saguntoappmobile
 
+import com.sagunto.saguntoappmobile.data.interfaces.IAuthRepository
 import com.sagunto.saguntoappmobile.data.network.provideHttpClient
 import com.sagunto.saguntoappmobile.data.repository.OrderRepository
 import com.sagunto.saguntoappmobile.data.repository.ProductRepository
@@ -26,7 +27,7 @@ val appModule = module {
     single { provideHttpClient() }
 
     // --- CAPA DE DATOS (Repositorios, Bases de datos, APIs) ---
-    singleOf(::AuthRepository)
+    singleOf(::AuthRepository) { bind<IAuthRepository>() }
     singleOf(::ProductRepository) { bind<IProductRepository>() }
     singleOf(::UserRepository) { bind<IUserRepository>() }
     singleOf(::OrderRepository) { bind<IOrderRepository>() }

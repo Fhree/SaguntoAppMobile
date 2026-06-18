@@ -49,9 +49,9 @@ class UserRepository(
         }
     }
 
-    override suspend fun addUser(user: CreateUserRequest, jwtToken: String): Result<CreateUserResponse> {
+    override suspend fun createUser(user: CreateUserRequest, jwtToken: String): Result<CreateUserResponse> {
         return try {
-            val response = httpClient.post("api/users") {
+            val response = httpClient.post("api/admin/users") {
                 contentType(ContentType.Application.Json)
                 header("Authorization", "Bearer $jwtToken")
                 setBody(user)

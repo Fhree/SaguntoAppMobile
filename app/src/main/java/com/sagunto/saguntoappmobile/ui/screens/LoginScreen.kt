@@ -121,13 +121,21 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(SaguntoSpacing.small))
 
-            TextButton(onClick = onNavigateToRegister) {
+            Button(
+                onClick = { onNavigateToRegister() },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp)
+            ) {
                 Text(
-                    text = "¿No tienes cuenta? Regístrate aquí",
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    "¿No tienes cuenta? Regístrate aquí",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.width(SaguntoSpacing.small))
             }
 
             loginStatus?.let { status ->

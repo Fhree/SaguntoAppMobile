@@ -3,7 +3,7 @@
     <string name="btn_log_in">Acceder</string>
     <string name="loginLabel_user">USUARIO</string>
     <string name="loginLabel_password">PASSWORD</string>
-    <string name="txtBox_user_placeholder">Introduce tu usuario</string>
+    <string name="txtBox_user_placeholder">Introduce tu email</string>
     <string name="txt_main_menu">Main Menu</string>
     <string name="btn_AddOrder">Consumición</string>
     <string name="btn_subTitle_AddOrder">Registrar nuevas consumiciones</string>
