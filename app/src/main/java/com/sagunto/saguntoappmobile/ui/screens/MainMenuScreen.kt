@@ -98,7 +98,7 @@ fun MainMenuScreen(
             MenuOptionCard(
                 title = "Mi Perfil",
                 subtitle = "Ver mi código saguntino",
-                iconResId = R.drawable.add_user, // Reutilizando un icono similar si no hay uno de perfil específico
+                iconResId = R.drawable.user_profile,
                 iconTint = Color.Magenta,
                 iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                 onClick = onClickNavToProfile
