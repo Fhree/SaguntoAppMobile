@@ -1,5 +1,6 @@
 package com.sagunto.saguntoappmobile.ui.screens
 
+import android.R.id.input
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -97,8 +98,8 @@ fun AddProductScreen(
                 label = "Precio Público",
                 placeholder = "Introduce el precio público",
                 value = viewModel.priceGuest.value,
-                onValueChange = {
-                    viewModel.priceGuest.value = it
+                onValueChange = {input ->
+                    viewModel.priceGuest.value = input.replace(',', '.')
                     viewModel.isPriceGuestTouched.value = true
                 },
                 isError = !viewModel.isPriceGuestValid && viewModel.isPriceGuestTouched.value,
@@ -111,8 +112,8 @@ fun AddProductScreen(
                 label = "Precio Saguntinos",
                 placeholder = "Introduce el precio para Saguntinos",
                 value = viewModel.priceMember.value,
-                onValueChange = {
-                    viewModel.priceMember.value = it
+                onValueChange = {input ->
+                    viewModel.priceMember.value = input.replace(',', '.')
                     viewModel.isPriceMemberTouched.value = true
                 },
                 isError = !viewModel.isPriceMemberValid && viewModel.isPriceMemberTouched.value,
