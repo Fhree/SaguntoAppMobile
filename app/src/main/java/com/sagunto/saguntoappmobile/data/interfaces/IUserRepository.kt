@@ -16,4 +16,5 @@ interface IUserRepository {
     suspend fun getUserByName(name: String): Result<List<UserResponse>>
     suspend fun getUserBySaguntinoCode(code: String): Result<UserResponse>
     suspend fun searchUsers(query: String): SearchUsersResponse
+    suspend fun getUserProfile(firebaseUid: String): Result<UserProfileResponse>
 }

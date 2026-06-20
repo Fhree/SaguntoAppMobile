@@ -11,4 +11,5 @@ interface IAuthRepository {
     suspend fun getJwtToken(refresh: Boolean = false): String?
 
     suspend fun registerUser(email: String, password: String): Result<Unit>
+    suspend fun loginWithEmail(email: String, password: String): Boolean
 }

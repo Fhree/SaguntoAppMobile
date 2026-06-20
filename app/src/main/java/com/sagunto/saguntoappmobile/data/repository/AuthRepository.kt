@@ -44,4 +44,14 @@ class AuthRepository: IAuthRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun loginWithEmail(email: String, password: String): Boolean{
+        return try {
+            auth.signInWithEmailAndPassword(email, password).await()
+            true
+        } catch (e: Exception) {
+            Log.e("FIREBASE_AUTH", "💥 Fallo en loginWithEmail", e)
+            false
+        }
+    }
 }

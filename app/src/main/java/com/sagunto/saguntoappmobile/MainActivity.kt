@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.sagunto.saguntoappmobile.data.interfaces.IAuthRepository
+import com.sagunto.saguntoappmobile.data.managers.SessionManager
 import com.sagunto.saguntoappmobile.ui.screens.*
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
@@ -34,6 +35,7 @@ import org.koin.android.ext.android.inject
 class MainActivity : ComponentActivity() {
 
     private val authRepository: IAuthRepository by inject()
+    private val sessionManager: SessionManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,8 +48,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    val currentUser by authRepository.currentUser.collectAsState()
-
+                    val currentUser by sessionManager.currentUser.collectAsState()
                     LaunchedEffect(currentUser) {
                         if (currentUser != null) {
                             navController.navigate("main_menu") {

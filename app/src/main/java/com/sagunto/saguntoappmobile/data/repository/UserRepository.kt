@@ -154,4 +154,22 @@ class UserRepository(
             SearchUsersResponse.Error("Error crítico de conexión: ${e.localizedMessage}")
         }
     }
+
+    override suspend fun getUserProfile(firebaseUid: String): Result<UserProfileResponse> {
+        return try {
+            val response = httpClient.get("/api/users/$firebaseUid/profile") {
+                contentType(ContentType.Application.Json)
+            }
+
+            if (response.status.isSuccess()) {
+                val responseData = response.body<UserProfileResponse>()
+                Result.success(responseData)
+            } else {
+                Result.failure(Exception("Fallo en la API get_User. Código HTTP: ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            Log.e("API_ERROR_GET_USER", "💥 Ha fallado la petición HTTP", e)
+            Result.failure(e)
+        }
+    }
 }

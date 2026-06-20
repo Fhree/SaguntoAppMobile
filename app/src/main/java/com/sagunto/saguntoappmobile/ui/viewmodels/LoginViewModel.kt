@@ -1,13 +1,22 @@
 package com.sagunto.saguntoappmobile.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.sagunto.saguntoappmobile.data.repository.AuthRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IAuthRepository
+import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.data.managers.SessionManager
+import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel.UiEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class LoginViewModel() : ViewModel() {
+class LoginViewModel(
+    private val authRepository: IAuthRepository,
+    private val userRepository: IUserRepository,
+    private val sessionManager: SessionManager
+) : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private val _username = MutableStateFlow("")
@@ -31,10 +40,33 @@ class LoginViewModel() : ViewModel() {
 
         _loginStatus.value = "Autenticando..."
 
-        auth.signInWithEmailAndPassword(currentEmail, currentPassword)
-        .addOnCompleteListener { task ->
-            if (!task.isSuccessful)
-                _loginStatus.value = "El email y contraseña no coinciden, vuelve a intentarlo."
+        viewModelScope.launch {
+
+            val isFirebaseSuccess = authRepository.loginWithEmail(currentEmail, currentPassword)
+
+            if (!isFirebaseSuccess) {
+                _loginStatus.value = "El email y contraseña no coinciden."
+                return@launch
+            }
+            val firebaseUid = FirebaseAuth.getInstance().currentUser?.uid
+
+            if (firebaseUid == null) {
+                _loginStatus.value = "Error crítico: No se pudo obtener la identidad del usuario."
+                return@launch
+            }
+
+            _loginStatus.value = "Recuperando perfil de usuario..."
+
+            val result = userRepository.getUserProfile(firebaseUid)
+            result.fold(
+                onSuccess = { userProfileData ->
+                    sessionManager.saveUserSession(userProfileData)
+                    _loginStatus.value = "¡Login exitoso!"
+                },
+                onFailure = { exception ->
+                    _loginStatus.value = "Error del servidor: ${exception.message}"
+                }
+            )
         }
     }
 
