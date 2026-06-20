@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sagunto.saguntoappmobile.R
+import com.sagunto.saguntoappmobile.data.managers.SessionManager
 import com.sagunto.saguntoappmobile.ui.components.MenuOptionCard
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 
@@ -34,7 +35,8 @@ fun MainMenuScreen(
     onClickNavToCheckStatistics: () -> Unit,
     onClickNavToAddUser: () -> Unit,
     onClickNavToProfile: () -> Unit,
-    onClickLogout: () -> Unit
+    onClickLogout: () -> Unit,
+    sessionManager: SessionManager
 ) {
     Scaffold(
         bottomBar = {
@@ -77,23 +79,25 @@ fun MainMenuScreen(
 
             Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
 
-            MenuOptionCard(
-                title = "Consumición",
-                subtitle = "Registrar nuevas comandas",
-                iconResId = R.drawable.add_order,
-                iconTint = Color.Green,
-                iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                onClick = onClickNavToSelectCustomerType
-            )
+            if(sessionManager.isAdmin() || sessionManager.isBartender()) {
+                MenuOptionCard(
+                    title = "Consumición",
+                    subtitle = "Registrar nuevas comandas",
+                    iconResId = R.drawable.add_order,
+                    iconTint = Color.Green,
+                    iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    onClick = onClickNavToSelectCustomerType
+                )
 
-            MenuOptionCard(
-                title = "Cobrar",
-                subtitle = "Gestionar pagos pendientes",
-                iconResId = R.drawable.payment,
-                iconTint = Color.Blue,
-                iconBgColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
-                onClick = onClickNavToPayment
-            )
+                MenuOptionCard(
+                    title = "Cobrar",
+                    subtitle = "Gestionar pagos pendientes",
+                    iconResId = R.drawable.payment,
+                    iconTint = Color.Blue,
+                    iconBgColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
+                    onClick = onClickNavToPayment
+                )
+            }
 
             MenuOptionCard(
                 title = "Mi Perfil",
@@ -104,14 +108,15 @@ fun MainMenuScreen(
                 onClick = onClickNavToProfile
             )
 
-            MenuOptionCard(
-                title = "Añadir producto",
-                subtitle = "Actualizar el inventario",
-                iconResId = R.drawable.add_product,
-                iconTint = Color.Red,
-                iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                onClick = onClickNavToAddProduct
-            )
+            if(sessionManager.isAdmin()) {
+                MenuOptionCard(
+                    title = "Añadir producto",
+                    subtitle = "Actualizar el inventario",
+                    iconResId = R.drawable.add_product,
+                    iconTint = Color.Red,
+                    iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    onClick = onClickNavToAddProduct
+                )
 // comentada por ir justo de tiempo
 //            MenuOptionCard(
 //                title = "Comprobar consumo",
@@ -122,14 +127,15 @@ fun MainMenuScreen(
 //                onClick = onClickNavToCheckStatistics
 //            )
 
-            MenuOptionCard(
-                title = "Añadir saguntino",
-                subtitle = "Registrar nuevo cliente VIP",
-                iconResId = R.drawable.add_user,
-                iconTint = Color.Cyan,
-                iconBgColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
-                onClick = onClickNavToAddUser
-            )
+                MenuOptionCard(
+                    title = "Añadir saguntino",
+                    subtitle = "Registrar nuevo cliente VIP",
+                    iconResId = R.drawable.add_user,
+                    iconTint = Color.Cyan,
+                    iconBgColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
+                    onClick = onClickNavToAddUser
+                )
+            }
         }
     }
 }
