@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
 
 }
@@ -90,15 +89,12 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
-
-    // 🛠️ NUEVO: Plugin de Autenticación de Ktor
-    // ⚠️ RECUERDA: Cambia "AQUI_TU_VERSION" por la versión que uses (ej: "3.0.0" o "2.3.11")
-    implementation("io.ktor:ktor-client-auth:AQUI_TU_VERSION")
-
+    implementation("io.ktor:ktor-client-auth:3.5.0")
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.compose.foundation.layout)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.foundation)
 
     // Testing
     testImplementation(libs.junit)

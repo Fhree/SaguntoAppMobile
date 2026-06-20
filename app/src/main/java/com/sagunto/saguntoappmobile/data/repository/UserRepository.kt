@@ -1,11 +1,11 @@
 package com.sagunto.saguntoappmobile.data.repository
 
 import android.util.Log
-import com.sagunto.saguntoappmobile.data.network.dto.createUser.*
-import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.SearchUsersResponse
-import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.UserResponse
+import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.*
 import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.data.network.dto.createOfflineUser.*
 import com.sagunto.saguntoappmobile.data.network.dto.userProfile.UserProfileResponse
+import com.sagunto.saguntoappmobile.data.network.dto.userRegister.*
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -26,7 +26,7 @@ class UserRepository(
     private val _userRole = MutableStateFlow<Int?>(null)
     override val userRole: StateFlow<Int?> = _userRole.asStateFlow()
 
-    override suspend fun fetchUserProfile(): Result<Unit> {
+    override suspend fun fetchUserProfile(): Result<UserProfileResponse> {
         return try {
             val response = httpClient.get("api/users/profile") {
                 contentType(ContentType.Application.Json)
@@ -36,7 +36,7 @@ class UserRepository(
                 val userProfile = response.body<UserProfileResponse>()
                 _userRole.value = userProfile.roleId
 
-                Result.success(Unit)
+                Result.success(userProfile)
             } else {
                 Result.failure(Exception("Fallo al obtener perfil. Código HTTP: ${response.status.value}"))
             }
@@ -47,15 +47,15 @@ class UserRepository(
         }
     }
 
-    override suspend fun createUser(user: CreateUserRequest): Result<CreateUserResponse> {
+    override suspend fun userRegister(user: UserRegisterRequest): Result<UserRegisterResponse> {
         return try {
-            val response = httpClient.post("api/admin/users") {
+            val response = httpClient.post("api/users/register") {
                 contentType(ContentType.Application.Json)
                 setBody(user)
             }
 
             if (response.status.isSuccess()) {
-                val responseData = response.body<CreateUserResponse>()
+                val responseData = response.body<UserRegisterResponse>()
                 Result.success(responseData)
             } else {
                 Result.failure(Exception("Fallo en la API add_User. Código HTTP: ${response.status.value}"))
@@ -67,9 +67,24 @@ class UserRepository(
         }
     }
 
-    override suspend fun addOfflineUser(user: CreateUserRequest): Result<CreateUserResponse> {
-        // Implementación pendiente o delegada a createUser si el endpoint es el mismo
-        return createUser(user)
+    override suspend fun addOfflineUser(user: CreateOfflineUserRequest): Result<CreateOfflineUserResponse> {
+        return try {
+            val response = httpClient.post("api/admin/users") {
+                contentType(ContentType.Application.Json)
+                setBody(user)
+            }
+
+            if (response.status.isSuccess()) {
+                val responseData = response.body<CreateOfflineUserResponse>()
+                Result.success(responseData)
+            } else {
+                Result.failure(Exception("Fallo en la API add_User. Código HTTP: ${response.status.value}"))
+            }
+
+        } catch (e: Exception) {
+            Log.e("API_ERROR_ADD_USER", "💥 Ha fallado la petición HTTP", e)
+            Result.failure(e)
+        }
     }
 
     override suspend fun getUserBySaguntinoCode(code: String): Result<UserResponse> {

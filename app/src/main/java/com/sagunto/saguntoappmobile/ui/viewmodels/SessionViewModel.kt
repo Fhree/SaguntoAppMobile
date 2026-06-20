@@ -30,7 +30,7 @@ class SessionViewModel(
                         val tokenResult = firebaseUser.getIdToken(true).await()
                         val token = tokenResult.token
                         if (token != null) {
-                            userRepository.fetchUserProfile(token)
+                            userRepository.fetchUserProfile()
                         }
                     } catch (e: Exception) {}
                 }

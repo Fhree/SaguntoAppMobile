@@ -3,7 +3,7 @@ package com.sagunto.saguntoappmobile.ui.viewmodels
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sagunto.saguntoappmobile.data.network.dto.createUser.CreateUserRequest
+import com.sagunto.saguntoappmobile.data.network.dto.createOfflineUser.CreateOfflineUserRequest
 import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
 import com.sagunto.saguntoappmobile.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AddUserViewModel(
+class AddOfflineUserViewModel(
     private val userRepository: IUserRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -32,6 +32,15 @@ class AddUserViewModel(
 
     var name = mutableStateOf("")
     var surname =  mutableStateOf("")
+    
+    // Lista de roles disponibles
+    val roles = listOf(
+        RoleInfo(id = 1, name = "Administrador"),
+        RoleInfo(id = 2, name = "Usuario Básico")
+    )
+    
+    private val _selectedRole = MutableStateFlow(roles[1]) // Por defecto Usuario Básico
+    val selectedRole: StateFlow<RoleInfo> = _selectedRole.asStateFlow()
 
     var isNameTouched = mutableStateOf(false)
     var isSurnameTouched = mutableStateOf(false)
@@ -42,6 +51,10 @@ class AddUserViewModel(
         get() = surname.value.isNotBlank()
     val isFormValid: Boolean
         get() = isNameValid && isSurnameValid
+
+    fun selectRole(role: RoleInfo) {
+        _selectedRole.value = role
+    }
 
     fun saveUser() {
         if(!isFormValid) return
@@ -56,12 +69,13 @@ class AddUserViewModel(
                 return@launch
             }
 
-            val user = CreateUserRequest(
+            val user = CreateOfflineUserRequest(
                 name = name.value,
-                surname = surname.value
+                surname = surname.value,
+                roleId = _selectedRole.value.id
             )
 
-            val result = userRepository.createUser(user, token)
+            val result = userRepository.addOfflineUser(user)
 
             result.fold(
                 onSuccess = { responseData ->
@@ -72,6 +86,7 @@ class AddUserViewModel(
                     surname.value = ""
                     isNameTouched.value = false
                     isSurnameTouched.value = false
+                    _selectedRole.value = roles[1]
                 },
                 onFailure = {
                     _uiEvent.emit(UiEvent.ShowToast("Error al añadir el usuario"))
@@ -90,4 +105,6 @@ class AddUserViewModel(
         _showCodeDialog.value = false
         _generatedSaguntinoCode.value = ""
     }
+    
+    data class RoleInfo(val id: Int, val name: String)
 }

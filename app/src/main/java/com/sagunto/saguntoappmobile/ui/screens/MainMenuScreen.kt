@@ -33,6 +33,7 @@ fun MainMenuScreen(
     onClickNavToAddProduct: () -> Unit,
     onClickNavToCheckStatistics: () -> Unit,
     onClickNavToAddUser: () -> Unit,
+    onClickNavToProfile: () -> Unit,
     onClickLogout: () -> Unit
 ) {
     Scaffold(
@@ -95,6 +96,15 @@ fun MainMenuScreen(
             )
 
             MenuOptionCard(
+                title = "Mi Perfil",
+                subtitle = "Ver mi código saguntino",
+                iconResId = R.drawable.add_user, // Reutilizando un icono similar si no hay uno de perfil específico
+                iconTint = Color.Magenta,
+                iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                onClick = onClickNavToProfile
+            )
+
+            MenuOptionCard(
                 title = "Añadir producto",
                 subtitle = "Actualizar el inventario",
                 iconResId = R.drawable.add_product,
@@ -102,15 +112,15 @@ fun MainMenuScreen(
                 iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                 onClick = onClickNavToAddProduct
             )
-
-            MenuOptionCard(
-                title = "Comprobar consumo",
-                subtitle = "Ver históricos y estadísticas",
-                iconResId = R.drawable.stadistics,
-                iconTint = Color.Red,
-                iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                onClick = onClickNavToCheckStatistics
-            )
+// comentada por ir justo de tiempo
+//            MenuOptionCard(
+//                title = "Comprobar consumo",
+//                subtitle = "Ver históricos y estadísticas",
+//                iconResId = R.drawable.stadistics,
+//                iconTint = Color.Red,
+//                iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+//                onClick = onClickNavToCheckStatistics
+//            )
 
             MenuOptionCard(
                 title = "Añadir saguntino",

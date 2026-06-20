@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.interfaces.IAuthRepository
 import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
-import com.sagunto.saguntoappmobile.data.network.dto.createUser.CreateUserRequest
+import com.sagunto.saguntoappmobile.data.network.dto.userRegister.UserRegisterRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -47,17 +47,17 @@ class UserRegisterViewModel(
                     val token = tokenResult?.token
 
                     if (token != null) {
-                        val request = CreateUserRequest(
+                        val request = UserRegisterRequest(
                             name = name.value,
                             surname = surname.value
                         )
 
-                        val netResult = userRepository.createUser(request, token)
+                        val netResult = userRepository.userRegister(request)
 
                         if (netResult.isSuccess) {
                             val code = netResult.getOrNull()?.saguntinoCode ?: "ERROR_CODE"
                             _successCode.value = code
-                            userRepository.fetchUserProfile(token)
+                            userRepository.fetchUserProfile()
                         } else {
                             _errorMessage.value = "Fallo al registrar en el servidor de Sagunto."
                         }
@@ -75,7 +75,6 @@ class UserRegisterViewModel(
         }
     }
 
-    // Función útil para limpiar el estado al salir de la pantalla
     fun resetSuccessState() {
         _successCode.value = null
     }

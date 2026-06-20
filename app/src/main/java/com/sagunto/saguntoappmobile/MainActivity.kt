@@ -21,11 +21,12 @@ import com.sagunto.saguntoappmobile.ui.screens.*
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoAppMobileTheme
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddProductViewModel
-import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.AddOfflineUserViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.LoginViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UserRegisterViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.UserProfileViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.android.ext.android.inject
@@ -81,13 +82,20 @@ class MainActivity : ComponentActivity() {
                                 onClickNavToAddProduct = {navController.navigate("add_product")},
                                 onClickNavToCheckStatistics = {navController.navigate("check_statistics")},
                                 onClickNavToAddUser = {navController.navigate("add_user")},
+                                onClickNavToProfile = {navController.navigate("user_profile")},
                                 onClickLogout = {
                                     authRepository.logout()
-
                                     navController.navigate("login") {
                                         popUpTo(0) { inclusive = true }
                                     }
                                 }
+                            )
+                        }
+
+                        composable("user_profile") {
+                            UserProfileScreen(
+                                viewModel = koinViewModel<UserProfileViewModel>(),
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
 
@@ -119,7 +127,7 @@ class MainActivity : ComponentActivity() {
                             CheckStatisticsScreen()
                         }
                         composable("add_user"){
-                            AddUserScreen(navController,viewModel = koinViewModel<AddUserViewModel>())
+                            AddUserScreen(navController,viewModel = koinViewModel<AddOfflineUserViewModel>())
                         }
                     }
                 }

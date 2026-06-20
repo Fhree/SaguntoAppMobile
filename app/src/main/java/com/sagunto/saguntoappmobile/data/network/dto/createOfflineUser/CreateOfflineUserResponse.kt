@@ -1,9 +1,9 @@
-package com.sagunto.saguntoappmobile.data.network.dto.createUser
+package com.sagunto.saguntoappmobile.data.network.dto.createOfflineUser
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateUserResponse (
+data class CreateOfflineUserResponse (
     val id: Int,
     val name: String,
     val surname: String,

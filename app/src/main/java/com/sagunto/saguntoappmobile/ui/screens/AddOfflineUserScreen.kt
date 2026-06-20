@@ -10,47 +10,41 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sagunto.saguntoappmobile.R
 import com.sagunto.saguntoappmobile.ui.components.StandardInputField
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
-import com.sagunto.saguntoappmobile.ui.viewmodels.AddUserViewModel
+import com.sagunto.saguntoappmobile.ui.viewmodels.AddOfflineUserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddUserScreen(
     navController: NavHostController,
-    viewModel: AddUserViewModel
+    viewModel: AddOfflineUserViewModel
 ) {
     val showDialog by viewModel.showCodeDialog.collectAsState()
     val saguntinoCode by viewModel.generatedSaguntinoCode.collectAsState()
+    val selectedRole by viewModel.selectedRole.collectAsState()
+    
+    var expanded by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is AddUserViewModel.UiEvent.ShowToast -> {
+                is AddOfflineUserViewModel.UiEvent.ShowToast -> {
                     Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                 }
             }
@@ -127,6 +121,53 @@ fun AddUserScreen(
                 isError = !viewModel.isSurnameValid && viewModel.isSurnameTouched.value,
                 errorMessage = "Los apellidos son obligatorios"
             )
+
+            Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
+            
+            // Dropdown de Roles
+            Text(
+                text = "Rol del usuario",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = selectedRole.name,
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                )
+                
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    viewModel.roles.forEach { role ->
+                        DropdownMenuItem(
+                            text = { Text(role.name) },
+                            onClick = {
+                                viewModel.selectRole(role)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
 

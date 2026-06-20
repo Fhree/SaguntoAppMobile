@@ -43,7 +43,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun SaguntoAppMobileTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
