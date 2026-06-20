@@ -124,50 +124,50 @@ fun AddUserScreen(
 
             Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
             
-            // Dropdown de Roles
-            Text(
-                text = "Rol del usuario",
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = selectedRole.name,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    shape = RoundedCornerShape(16.dp)
-                )
-                
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    viewModel.roles.forEach { role ->
-                        DropdownMenuItem(
-                            text = { Text(role.name) },
-                            onClick = {
-                                viewModel.selectRole(role)
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
+//            // Dropdown de Roles
+//            Text(
+//                text = "Rol del usuario",
+//                color = MaterialTheme.colorScheme.primary,
+//                fontSize = 14.sp,
+//                fontWeight = FontWeight.Bold,
+//                modifier = Modifier.padding(bottom = 8.dp)
+//            )
+//
+//            ExposedDropdownMenuBox(
+//                expanded = expanded,
+//                onExpandedChange = { expanded = !expanded },
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                OutlinedTextField(
+//                    value = selectedRole.name,
+//                    onValueChange = {},
+//                    readOnly = true,
+//                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+//                    modifier = Modifier
+//                        .menuAnchor()
+//                        .fillMaxWidth(),
+//                    colors = OutlinedTextFieldDefaults.colors(
+//                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+//                        unfocusedContainerColor = MaterialTheme.colorScheme.surface
+//                    ),
+//                    shape = RoundedCornerShape(16.dp)
+//                )
+//
+//                ExposedDropdownMenu(
+//                    expanded = expanded,
+//                    onDismissRequest = { expanded = false }
+//                ) {
+//                    viewModel.roles.forEach { role ->
+//                        DropdownMenuItem(
+//                            text = { Text(role.name) },
+//                            onClick = {
+//                                viewModel.selectRole(role)
+//                                expanded = false
+//                            }
+//                        )
+//                    }
+//                }
+//            }
 
             Spacer(modifier = Modifier.height(SaguntoSpacing.extraLarge))
 

@@ -86,6 +86,7 @@ class MainActivity : ComponentActivity() {
                                 onClickNavToProfile = {navController.navigate("user_profile")},
                                 onClickLogout = {
                                     authRepository.logout()
+                                    sessionManager.clearSession()
                                     navController.navigate("login") {
                                         popUpTo(0) { inclusive = true }
                                     }

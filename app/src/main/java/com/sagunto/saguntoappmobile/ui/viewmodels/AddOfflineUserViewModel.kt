@@ -71,8 +71,7 @@ class AddOfflineUserViewModel(
 
             val user = CreateOfflineUserRequest(
                 name = name.value,
-                surname = surname.value,
-                roleId = _selectedRole.value.id
+                surname = surname.value
             )
 
             val result = userRepository.addOfflineUser(user)

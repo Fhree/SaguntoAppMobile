@@ -59,6 +59,8 @@ class UserRegisterViewModel(
                             _successCode.value = code
                             userRepository.fetchUserProfile()
                         } else {
+                            authRepository.deleteUserWithEmail(email.value)
+                            authRepository.logout()
                             _errorMessage.value = "Fallo al registrar en el servidor de Sagunto."
                         }
                     } else {

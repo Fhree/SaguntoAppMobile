@@ -5,6 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateOfflineUserRequest (
     val name: String,
-    val surname: String,
-    val roleId: Int
+    val surname: String
 )
