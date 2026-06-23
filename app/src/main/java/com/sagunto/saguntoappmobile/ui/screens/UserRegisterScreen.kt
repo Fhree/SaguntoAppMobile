@@ -5,8 +5,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+// 🛠️ CRÍTICO: Asegúrate de importar tu componente
+import com.sagunto.saguntoappmobile.ui.components.StandardInputField
 import com.sagunto.saguntoappmobile.ui.viewmodels.UserRegisterViewModel
 
 @Composable
@@ -44,36 +45,37 @@ fun UserRegisterScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        OutlinedTextField(
+        // 🛠️ Aplicado StandardInputField
+        StandardInputField(
             value = name,
             onValueChange = { viewModel.name.value = it },
-            label = { Text("Nombre *") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Nombre",
+            placeholder = "Introduce tu nombre"
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        StandardInputField(
             value = surname,
             onValueChange = { viewModel.surname.value = it },
-            label = { Text("Apellidos (Opcional)") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Apellidos (Opcional)",
+            placeholder = "Introduce tus apellidos"
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        StandardInputField(
             value = email,
             onValueChange = { viewModel.email.value = it },
-            label = { Text("Correo Electrónico *") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Correo Electrónico",
+            placeholder = "tu@email.com"
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        // ⚠️ ADVERTENCIA: Revisa que tu StandardInputField soporte enmascarar contraseñas
+        StandardInputField(
             value = password,
             onValueChange = { viewModel.password.value = it },
-            label = { Text("Contraseña *") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            label = "Contraseña",
+            placeholder = "••••••••"
         )
         Spacer(modifier = Modifier.height(24.dp))
 
