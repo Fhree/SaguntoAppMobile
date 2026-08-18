@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     id("com.google.gms.google-services")
-
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -96,6 +96,18 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
     implementation(libs.androidx.material3)
     implementation(libs.androidx.foundation)
+
+    // --- OFFLINE FIRST ---
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler) // KSP procesa las anotaciones @Dao y @Database
+
+    // WorkManager
+    implementation(libs.work.runtime.ktx)
+
+    // Koin WorkManager Integration
+    implementation(libs.koin.androidx.workmanager)
 
     // Testing
     testImplementation(libs.junit)

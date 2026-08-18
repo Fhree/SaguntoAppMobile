@@ -21,6 +21,9 @@ kotlinxSerializationPlugin = "2.2.21"
 foundationLayout = "1.11.2"
 material3 = "1.4.0"
 foundationVersion = "1.11.3"
+room = "2.6.1"
+work = "2.10.0"
+ksp = "2.2.21-2.0.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,10 +54,16 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3",
 androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
+koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koinAndroidxCompose" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerializationPlugin" }
-
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
