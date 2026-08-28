@@ -105,6 +105,7 @@ dependencies {
 
     // WorkManager
     implementation(libs.work.runtime.ktx)
+    implementation("com.google.code.gson:gson:2.11.0")
 
     // Koin WorkManager Integration
     implementation(libs.koin.androidx.workmanager)

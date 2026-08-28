@@ -1,6 +1,5 @@
 package com.sagunto.saguntoappmobile.data.network.dto.createOrder
 
-import android.view.inputmethod.TextSnapshot
 import kotlinx.serialization.Serializable
 
 @Serializable
