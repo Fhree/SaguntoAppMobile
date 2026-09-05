@@ -12,13 +12,20 @@ import com.sagunto.saguntoappmobile.data.network.dto.createOrder.CreateOrderRequ
 import com.sagunto.saguntoappmobile.data.network.dto.unpaidOrder.UnpaidOrderResponse
 import com.sagunto.saguntoappmobile.data.interfaces.IOrderRepository
 import com.sagunto.saguntoappmobile.data.workers.SyncOrdersWorker
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.post
 import io.ktor.client.HttpClient
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 
 import java.util.UUID
 
 class OrderRepository(
     private val orderDao: OrderDao,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val httpClient: HttpClient
 ) : IOrderRepository {
 
     override suspend fun addOrder(order: CreateOrderRequest): Result<String> {
@@ -60,10 +67,36 @@ class OrderRepository(
 
 
     override suspend fun getUnpaidOrders(customerId: Int): Result<List<UnpaidOrderResponse>> {
-        return Result.failure(Exception("Omitido por brevedad"))
+        return try {
+            val response = httpClient.get("api/orders/${customerId}/without-payment") {
+                contentType(ContentType.Application.Json)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(response.body())
+            } else {
+                Result.failure(Exception("Fallo en la API. Código HTTP: ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            Log.e("API_ERROR", "💥 Ha fallado la petición HTTP", e)
+            return Result.failure(e)
+        }
     }
 
     override suspend fun payOrders(customerId: Int): Result<String> {
-        return Result.failure(Exception("Omitido por brevedad"))
+        return try {
+            val response = httpClient.post("api/orders/${customerId}/payall") {
+                contentType(ContentType.Application.Json)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(response.body())
+            } else {
+                Result.failure(Exception("Fallo en la API. Código HTTP: ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            Log.e("API_ERROR", "💥 Ha fallado la petición HTTP", e)
+            return Result.failure(e)
+        }
     }
 }
