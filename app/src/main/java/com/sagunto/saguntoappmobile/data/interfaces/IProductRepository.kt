@@ -7,5 +7,5 @@ import com.sagunto.saguntoappmobile.data.network.dto.getProductsByCustomerId.Get
 interface IProductRepository {
     suspend fun addProduct(request: CreateProductRequest): Result<Unit>
     suspend fun getProducts(): Result<GetProductsResponse>
-    suspend fun getProductsByCustomerId(request: Int): Result<List<GetProductsByCustomerId>>
+    suspend fun getProductsByCustomerId(request: Boolean): Result<List<GetProductsByCustomerId>>
 }

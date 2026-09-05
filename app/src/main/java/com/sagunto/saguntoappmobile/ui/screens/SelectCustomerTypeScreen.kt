@@ -46,12 +46,10 @@ import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 fun SelectCustomerTypeScreen(
     navController: NavHostController,
     viewModel: SelectCustomerTypeViewModel,
-    onClickToAddOrder: (Int) -> Unit
+    onClickToAddOrder: (Boolean) -> Unit
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
-    val showDialog by viewModel.showDialog.collectAsState()
-    val messageDialog by viewModel.messageDialog.collectAsState()
 
     Scaffold(
         topBar = {
@@ -83,26 +81,13 @@ fun SelectCustomerTypeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            StandardInputField(
-                label = stringResource(R.string.txtBox_saguntino_code_label),
-                placeholder = stringResource(R.string.txtBox_saguntino_code_placeholder),
-                value = searchQuery,
-                onValueChange = { nuevoTexto ->
-                    viewModel.updateSearchQuery(nuevoTexto)
-                },
-                isError = !viewModel.isSaguntinoCodeValid && viewModel.isSaguntinoCodeTouched,
-                errorMessage = "El nombre es obligatorio"
-            )
-            Spacer(modifier = Modifier.height(SaguntoSpacing.itemSpacing))
             MenuOptionCard(
                 title = "SAGUNTINO",
                 subtitle = "Crear pedidos para Saguntinos",
                 iconResId = R.drawable.add_order,
                 iconTint = MaterialTheme.colorScheme.tertiary,
                 iconBgColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                onClick = {
-                    viewModel.searchUsers { userId -> onClickToAddOrder(userId) }
-                }
+                onClick = { onClickToAddOrder(true) }
             )
             Spacer(modifier = Modifier.height(SaguntoSpacing.itemSpacing))
             MenuOptionCard(
@@ -111,42 +96,8 @@ fun SelectCustomerTypeScreen(
                 iconResId = R.drawable.payment,
                 iconTint = MaterialTheme.colorScheme.primary,
                 iconBgColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                onClick = { onClickToAddOrder(-1) }
+                onClick = { onClickToAddOrder(false) }
             )
         }
-    }
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { viewModel.dismissDialog() },
-            title = { Text(messageDialog) },
-            text = {
-                LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
-                    items(searchResults) { user ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    viewModel.dismissDialog()
-                                    onClickToAddOrder(user.id)
-                                }
-                                .padding(SaguntoSpacing.medium)
-                        ) {
-                            Text(
-                                text = "${user.name} ${user.surname} (${user.saguntinoCode})",
-                                fontSize = 18.sp,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        HorizontalDivider()
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { viewModel.dismissDialog() }) {
-                    Text("Cancelar")
-                }
-            }
-        )
     }
 }

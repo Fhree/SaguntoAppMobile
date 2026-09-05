@@ -106,19 +106,22 @@ class MainActivity : ComponentActivity() {
                             SelectCustomerTypeScreen(
                                 navController = navController,
                                 viewModel = koinViewModel<SelectCustomerTypeViewModel>(),
-                                onClickToAddOrder = { id ->
-                                    navController.navigate("add_order/$id")
+                                onClickToAddOrder = { isSaguntino ->
+                                    navController.navigate("add_order/$isSaguntino")
                                 }
                             )
                         }
-                        composable(
-                            "add_order/{id}",
-                            arguments = listOf(navArgument("id") { type = NavType.IntType })
+                        composable(route = "add_order/{isSaguntino}",
+                            arguments = listOf(navArgument("isSaguntino") { type = NavType.BoolType })
                         ){ backStackEntry ->
-                            val id = backStackEntry.arguments?.getInt("id") ?: -1
+                            val isSaguntino = backStackEntry.arguments?.getBoolean("isSaguntino") ?: false
 
-                            AddOrderScreen(navController,
-                                viewModel = koinViewModel<AddOrderViewModel>(parameters = { parametersOf(id) }))
+                            AddOrderScreen(
+                                navController = navController,
+                                viewModel = koinViewModel<AddOrderViewModel>(
+                                    parameters = { parametersOf(isSaguntino) }
+                                )
+                            )
                         }
                         composable("checkout"){
                             UnpaidOrderScreen(navController, viewModel = koinViewModel<UnpaidOrderViewModel>())

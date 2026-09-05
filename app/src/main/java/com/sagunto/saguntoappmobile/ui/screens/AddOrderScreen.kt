@@ -1,6 +1,7 @@
 package com.sagunto.saguntoappmobile.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.sagunto.saguntoappmobile.R
 import com.sagunto.saguntoappmobile.ui.components.ProductCard
+import com.sagunto.saguntoappmobile.ui.components.StandardInputField
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
 
@@ -68,6 +72,11 @@ fun AddOrderScreen(
     val messageDialog by viewModel.messageDialog.collectAsState()
     val isOrderSuccess by viewModel.isOrderSuccess.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    // 🛠️ --- INJERTO: Escuchamos los estados del buscador ---
+    val showSearchDialog by viewModel.showSearchDialog.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val searchResults by viewModel.searchResults.collectAsState()
 
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var showPaymentDialog by remember { mutableStateOf(false) }
@@ -123,9 +132,8 @@ fun AddOrderScreen(
                 Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
 
                 Button(
-                    onClick = { showPaymentDialog = true },
+                    onClick = { showPaymentDialog = true }, // 🛠️ Dispara el primer modal
                     modifier = Modifier.fillMaxWidth(),
-                    // 🛠️ Bloqueamos el botón si la lista está vacía o el servidor está cargando la petición
                     enabled = cartItems.isNotEmpty() && !isLoading
                 ) {
                     Text(if (isLoading) "CREANDO..." else "CREAR PEDIDO")
@@ -149,7 +157,6 @@ fun AddOrderScreen(
                     value = "Añadir consumición...",
                     onValueChange = {},
                     readOnly = true,
-                    // 🛠️ Añadimos un icono de acción para que parezca un botón, no un texto
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.AddShoppingCart,
@@ -163,7 +170,6 @@ fun AddOrderScreen(
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        // 🛠️ Matamos las líneas de contorno y le damos color de superficie
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent,
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -192,17 +198,16 @@ fun AddOrderScreen(
                                         text = product.name,
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 16.sp,
-                                        maxLines = 2, // 🛠️ Limitamos a 2 líneas como máximo
-                                        overflow = TextOverflow.Ellipsis, // 🛠️ Añade "..." si el texto no cabe
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier
-                                            .weight(1f) // 🛠️ Toma el espacio sobrante sin aplastar al precio
-                                            .padding(end = 8.dp) // 🛠️ Deja un respiro visual antes del precio
+                                            .weight(1f)
+                                            .padding(end = 8.dp)
                                     )
                                     Text(
                                         text = "${product.price} €",
                                         fontWeight = FontWeight.Black,
                                         color = MaterialTheme.colorScheme.primary,
-                                        // 🛠️ Al no tener weight, Compose le reservará exactamente el ancho que necesite
                                     )
                                 }
                             },
@@ -235,6 +240,7 @@ fun AddOrderScreen(
         }
     }
 
+    // 🛠️ --- DIÁLOGO 1: LA DECISIÓN DE PAGO ---
     if (showPaymentDialog) {
         if (viewModel.isSaguntino) {
             AlertDialog(
@@ -250,7 +256,7 @@ fun AddOrderScreen(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
                                 showPaymentDialog = false
-                                // 🛠️ Solo enviamos a .NET. No navegamos.
+                                // Paga ahora. El ViewModel inyectará el -2 internamente.
                                 viewModel.saveOrder(isPaid = true)
                             }
                         ) {
@@ -262,7 +268,8 @@ fun AddOrderScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                             onClick = {
                                 showPaymentDialog = false
-                                viewModel.saveOrder(isPaid = false)
+                                // Deja a deber. Lanzamos el buscador de Saguntinos.
+                                viewModel.showSearchDialog()
                             }
                         ) {
                             Text("No, dejar pendiente")
@@ -299,6 +306,66 @@ fun AddOrderScreen(
         }
     }
 
+    // 🛠️ --- DIÁLOGO 2: EL BUSCADOR (Solo si elige "A Deber") ---
+    if (showSearchDialog) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissSearchDialog() },
+            title = { Text("Buscar Saguntino moroso") },
+            text = {
+                Column {
+                    StandardInputField(
+                        label = stringResource(R.string.txtBox_saguntino_code_label),
+                        placeholder = stringResource(R.string.txtBox_saguntino_code_placeholder),
+                        value = searchQuery,
+                        onValueChange = { viewModel.updateSearchQuery(it) },
+                        isError = !viewModel.isSaguntinoCodeValid && viewModel.isSaguntinoCodeTouched,
+                        errorMessage = "El nombre es obligatorio"
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = { viewModel.searchUsers() },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = searchQuery.isNotBlank() && !isLoading
+                    ) {
+                        Text(if (isLoading) "Buscando..." else "Buscar")
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    LazyColumn(modifier = Modifier.heightIn(max = 200.dp)) {
+                        items(searchResults) { user ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.dismissSearchDialog()
+                                        // Guardamos con el ID real del saguntino encontrado y isPaid a false
+                                        viewModel.saveOrder(isPaid = false, targetCustomerId = user.id)
+                                    }
+                                    .padding(vertical = 12.dp)
+                            ) {
+                                Text(
+                                    text = "${user.name} ${user.surname} (${user.saguntinoCode})",
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            HorizontalDivider()
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.dismissSearchDialog() }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    // 🛠️ --- DIÁLOGO 3: EL RESULTADO FINAL ---
     if (showResultDialog) {
         AlertDialog(
             onDismissRequest = {  },

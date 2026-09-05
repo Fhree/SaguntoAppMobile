@@ -55,7 +55,7 @@ class ProductRepository(
         }
     }
 
-    override suspend fun getProductsByCustomerId(request: Int): Result<List<GetProductsByCustomerId>> {
+    override suspend fun getProductsByCustomerId(request: Boolean): Result<List<GetProductsByCustomerId>> {
         return try{
             val response = httpClient.get("api/products/$request"){
                 contentType(ContentType.Application.Json)
