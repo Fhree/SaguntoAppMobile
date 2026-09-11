@@ -15,6 +15,7 @@ import com.sagunto.saguntoappmobile.data.managers.SessionManager
 import com.sagunto.saguntoappmobile.data.repository.AuthRepository
 import com.sagunto.saguntoappmobile.ui.viewmodels.*
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel // 🛠️ Importante añadir este import
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -28,12 +29,16 @@ val appModule = module {
             androidContext(),
             SaguntoDatabase::class.java,
             "sagunto_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
+
     single { get<SaguntoDatabase>().orderDao() }
+    single { get<SaguntoDatabase>().productDao() }
+    single { get<SaguntoDatabase>().userDao() }
 
     single { WorkManager.getInstance(androidContext()) }
-
 
     singleOf(::AuthRepository) { bind<IAuthRepository>() }
     singleOf(::ProductRepository) { bind<IProductRepository>() }
@@ -45,7 +50,19 @@ val appModule = module {
     viewModelOf(::LoginViewModel)
     viewModelOf(::AddProductViewModel)
     viewModelOf(::AddOfflineUserViewModel)
-    viewModelOf(::AddOrderViewModel)
+
+    // 🛠️ 2. Mapeo manual para AddOrderViewModel.
+    // Así Koin sabrá exactamente dónde colocar el booleano 'isSaguntino' que le pasamos desde MainActivity
+    viewModel { (isSaguntino: Boolean) ->
+        AddOrderViewModel(
+            orderRepository = get(),
+            productRepository = get(),
+            userRepository = get(),
+            isSaguntino = isSaguntino,
+            sessionManager = get()
+        )
+    }
+
     viewModelOf(::SelectCustomerTypeViewModel)
     viewModelOf(::UnpaidOrderViewModel)
     viewModelOf(::UserRegisterViewModel)

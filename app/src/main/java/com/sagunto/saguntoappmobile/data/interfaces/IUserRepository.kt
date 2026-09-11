@@ -17,4 +17,5 @@ interface IUserRepository {
     suspend fun getUserBySaguntinoCode(code: String): Result<UserResponse>
     suspend fun searchUsers(query: String): SearchUsersResponse
     suspend fun getUserProfile(firebaseUid: String): Result<UserProfileResponse>
+    suspend fun syncSaguntinos(): Result<Unit>
 }

@@ -3,7 +3,10 @@ package com.sagunto.saguntoappmobile.data.repository
 import android.util.Log
 import com.sagunto.saguntoappmobile.data.network.dto.searchUsers.*
 import com.sagunto.saguntoappmobile.data.interfaces.IUserRepository
+import com.sagunto.saguntoappmobile.data.local.UserDao
+import com.sagunto.saguntoappmobile.data.local.UserEntity
 import com.sagunto.saguntoappmobile.data.network.dto.createOfflineUser.*
+import com.sagunto.saguntoappmobile.data.network.dto.saguntinoOfflineSync.SaguntinoOfflineDto
 import com.sagunto.saguntoappmobile.data.network.dto.userProfile.UserProfileResponse
 import com.sagunto.saguntoappmobile.data.network.dto.userRegister.*
 import io.ktor.client.HttpClient
@@ -17,9 +20,11 @@ import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.collections.map
 
 class UserRepository(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    private val userDao: UserDao
 ) : IUserRepository {
 
     private val saguntinoCodeRegex = Regex("^[a-zA-Z]\\d{2}$")
@@ -169,6 +174,36 @@ class UserRepository(
             }
         } catch (e: Exception) {
             Log.e("API_ERROR_GET_USER", "💥 Ha fallado la petición HTTP", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun syncSaguntinos(): Result<Unit> {
+        return try {
+            val response = httpClient.get("api/users/saguntinos") {
+                contentType(ContentType.Application.Json)
+            }
+
+            if (response.status.isSuccess()) {
+                val networkData = response.body<List<SaguntinoOfflineDto>>()
+
+                val entities = networkData.map { dto ->
+                    UserEntity(
+                        id = dto.id,
+                        name = dto.name,
+                        surname = dto.surname,
+                        saguntinoCode = dto.saguntinoCode,
+                        normalizedSearch = dto.normalizedSearch
+                    )
+                }
+
+                userDao.insertAll(entities)
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Fallo HTTP: ${response.status.value}"))
+            }
+        } catch (e: Exception) {
+            Log.e("API_ERROR", "💥 Fallo de red en syncSaguntinos", e)
             Result.failure(e)
         }
     }

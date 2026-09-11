@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
 class AddOrderViewModel(
     private val orderRepository: IOrderRepository,
     private val productRepository: IProductRepository,
-    private val userRepository: IUserRepository, // 🛠️ Inyectamos el repositorio de usuarios
-    val isSaguntino: Boolean, // 🛠️ Recibimos el booleano desde la navegación
+    private val userRepository: IUserRepository,
+    val isSaguntino: Boolean,
     private val sessionManager: SessionManager
 ): ViewModel() {
 
@@ -56,26 +56,28 @@ class AddOrderViewModel(
     val isSaguntinoCodeTouched: Boolean = false
 
     init {
-        getProducts()
+        observeLocalProducts()
     }
 
-    fun getProducts(){
-        viewModelScope.launch{
-            // 🛠️ Pasamos el booleano al repositorio de productos
-            val result = productRepository.getProductsByCustomerId(isSaguntino)
-
-            result.fold(
-                onSuccess = { productList ->
-                    _productCatalog.value = productList
-                },
-                onFailure = { error ->
-                    //TODO: Manejar el error de carga
+    private fun observeLocalProducts() {
+        viewModelScope.launch {
+            // 🛠️ Nos suscribimos al Flow de Room. Cada vez que SQLite cambie, esto se re-ejecuta solo.
+            productRepository.getAllProductsLocal().collect { localEntities ->
+                val mappedProducts = localEntities.map { entity ->
+                    // Reutilizamos tu DTO actual para no romper la UI ni el carrito
+                    GetProductsByCustomerId(
+                        id = entity.id,
+                        name = entity.name,
+                        // 🛠️ Mapeo dinámico: el ViewModel decide qué precio ver
+                        price = if (isSaguntino) entity.priceMember else entity.priceGuest
+                    )
                 }
-            )
+                _productCatalog.value = mappedProducts
+            }
         }
     }
 
-    // 🛠️ --- INJERTO: Lógica de búsqueda ---
+    // 🛠️ --- Lógica de búsqueda ---
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }
@@ -100,7 +102,6 @@ class AddOrderViewModel(
             when (val result = userRepository.searchUsers(currentQuery)) {
                 is SearchUsersResponse.SingleResult -> {
                     dismissSearchDialog()
-                    // Si encuentra uno solo, guardamos directamente "A deber" con su ID
                     saveOrder(isPaid = false, targetCustomerId = result.user.id)
                 }
                 is SearchUsersResponse.MultipleResults -> {
@@ -159,17 +160,15 @@ class AddOrderViewModel(
         }
     }
 
-    // 🛠️ MODIFICADO: Aceptamos un ID específico opcional si se buscó a un saguntino
     fun saveOrder(isPaid: Boolean, targetCustomerId: Int? = null) {
         viewModelScope.launch {
             _isLoading.value = true
 
-            // 🛠️ Árbol de decisión para aislar el Magic Number (-2)
             val finalCustomerId = when {
-                !isSaguntino -> -1             // Invitado
-                isPaid -> -2                   // Saguntino pagado en barra
-                targetCustomerId != null -> targetCustomerId // Saguntino moroso encontrado
-                else -> -1                     // Fallback de seguridad
+                !isSaguntino -> -1
+                isPaid -> -2
+                targetCustomerId != null -> targetCustomerId
+                else -> -1
             }
 
             val order = CreateOrderRequest(

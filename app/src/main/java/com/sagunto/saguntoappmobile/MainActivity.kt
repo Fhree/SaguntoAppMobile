@@ -1,9 +1,10 @@
 package com.sagunto.saguntoappmobile
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -16,6 +17,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.google.android.gms.security.ProviderInstaller
 import com.sagunto.saguntoappmobile.data.interfaces.IAuthRepository
 import com.sagunto.saguntoappmobile.data.managers.SessionManager
 import com.sagunto.saguntoappmobile.ui.screens.*
@@ -28,9 +36,11 @@ import com.sagunto.saguntoappmobile.ui.viewmodels.SelectCustomerTypeViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UserRegisterViewModel
 import com.sagunto.saguntoappmobile.ui.viewmodels.UserProfileViewModel
+import com.sagunto.saguntoappmobile.workers.SyncProductsWorker
+import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import org.koin.android.ext.android.inject
+import java.util.concurrent.TimeUnit
 
 class MainActivity : ComponentActivity() {
 
@@ -38,8 +48,20 @@ class MainActivity : ComponentActivity() {
     private val sessionManager: SessionManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        try {
+            ProviderInstaller.installIfNeeded(this)
+            Log.i("SECURITY", "TLS Provider actualizado correctamente")
+        } catch (e: Exception) {
+            Log.e("SECURITY", "Fallo al actualizar el proveedor TLS", e)
+        }
+
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // 🛠️ Registramos el worker para que sincronice en segundo plano
+        setupBackgroundSync(this)
+
+        // enableEdgeToEdge()
         setContent {
             SaguntoAppMobileTheme {
                 Surface(
@@ -91,7 +113,7 @@ class MainActivity : ComponentActivity() {
                                         popUpTo(0) { inclusive = true }
                                     }
                                 },
-                            sessionManager = sessionManager
+                                sessionManager = sessionManager
                             )
                         }
 
@@ -139,5 +161,29 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun setupBackgroundSync(context: Context) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .build()
+
+        val periodicSync = PeriodicWorkRequestBuilder<SyncProductsWorker>(
+            12, TimeUnit.HOURS
+        )
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "PeriodicSyncProductsWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            periodicSync
+        )
+
+        val immediateSync = OneTimeWorkRequestBuilder<SyncProductsWorker>()
+            //.setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(immediateSync)
     }
 }

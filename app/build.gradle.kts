@@ -1,5 +1,4 @@
 import java.util.Properties
-import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
@@ -21,24 +20,27 @@ android {
 
     defaultConfig {
         applicationId = "com.sagunto.saguntoappmobile"
-        minSdk = 29
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val envBaseUrl = System.getenv("API_BASE_URL")//Producción
-
-        val properties = Properties()//Local
+        val envBaseUrl = System.getenv("API_BASE_URL")
+        val properties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
+
         if (localPropertiesFile.exists()) {
-            properties.load(FileInputStream(localPropertiesFile))
+            localPropertiesFile.inputStream().use { stream ->
+                properties.load(stream)
+            }
         }
         val localBaseUrl = properties.getProperty("API_BASE_URL")
 
-        val baseUrl = envBaseUrl ?: localBaseUrl
-        //buildConfigField("String", "API_BASE_URL", if (baseUrl != null) "\"$baseUrl\"" else "\"http://192.168.1.123:7010/\"")
-        buildConfigField("String", "API_BASE_URL", if (baseUrl != null) "\"$baseUrl\"" else "\"http://10.0.2.2:7010/\"")
+        val rawBaseUrl = envBaseUrl ?: localBaseUrl ?: "http://10.0.2.2:7010/"
+        val finalBaseUrl = if (rawBaseUrl.endsWith("/")) rawBaseUrl else "$rawBaseUrl/"
+
+        buildConfigField("String", "API_BASE_URL", "\"$finalBaseUrl\"")
     }
 
     buildTypes {
@@ -63,9 +65,9 @@ android {
 }
 
 dependencies {
-    // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.14.0"))
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.android.gms:play-services-base:18.5.0")
 
     // UI y Core
     implementation(libs.androidx.core.ktx)
@@ -78,6 +80,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
 
@@ -92,22 +95,16 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation("io.ktor:ktor-client-auth:3.5.0")
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.androidx.compose.foundation.layout)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.foundation)
 
-    // --- OFFLINE FIRST ---
-    // Room
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler) // KSP procesa las anotaciones @Dao y @Database
+    // Offline First
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
 
-    // WorkManager
     implementation(libs.work.runtime.ktx)
     implementation("com.google.code.gson:gson:2.11.0")
-
-    // Koin WorkManager Integration
     implementation(libs.koin.androidx.workmanager)
 
     // Testing
