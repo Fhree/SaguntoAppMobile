@@ -52,11 +52,17 @@ class UnpaidOrderViewModel(
             _isLoading.value = true
 
             when (val result = userRepository.searchUsers(_searchQuery.value)) {
-                is SearchUsersResponse.SingleResult -> {
-                    selectCustomer(result.user)
-                }
                 is SearchUsersResponse.MultipleResults -> {
-                    _searchResults.value = result.users
+                    if (result.users.isEmpty()) {
+                        _messageDialog.value = "No se encontró ningún saguntino con ese criterio."
+                        _showResultDialog.value = true
+                    } else {
+                        _searchResults.value = result.users
+                        _showSearchDialog.value = true
+                    }
+                }
+                is SearchUsersResponse.SingleResult -> {
+                    _searchResults.value = listOf(result.user)
                     _showSearchDialog.value = true
                 }
                 is SearchUsersResponse.Error -> {

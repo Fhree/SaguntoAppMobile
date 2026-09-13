@@ -67,6 +67,7 @@ class AddProductViewModel(
                 isPriceMemberTouched = mutableStateOf(false)
             }
             _isLoading.value = false
+            repository.syncProducts()
         }
     }
 

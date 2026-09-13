@@ -1,5 +1,6 @@
 package com.sagunto.saguntoappmobile.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sagunto.saguntoappmobile.data.network.dto.createOrder.CreateOrderRequest
@@ -57,6 +58,7 @@ class AddOrderViewModel(
 
     init {
         observeLocalProducts()
+        refreshProductsSilently()
     }
 
     private fun observeLocalProducts() {
@@ -93,25 +95,31 @@ class AddOrderViewModel(
     }
 
     fun searchUsers() {
-        val currentQuery = _searchQuery.value.trim()
-        if (currentQuery.isEmpty()) return
-
         viewModelScope.launch {
             _isLoading.value = true
 
-            when (val result = userRepository.searchUsers(currentQuery)) {
-                is SearchUsersResponse.SingleResult -> {
-                    dismissSearchDialog()
-                    saveOrder(isPaid = false, targetCustomerId = result.user.id)
-                }
+            when (val result = userRepository.searchUsers(_searchQuery.value)) {
                 is SearchUsersResponse.MultipleResults -> {
-                    _searchResults.value = result.users
+                    if (result.users.isEmpty()) {
+                        _messageDialog.value = "No se encontraron saguntinos con ese código o nombre."
+                        _isOrderSuccess.value = false
+                        _showResultDialog.value = true
+                    } else {
+                        _searchResults.value = result.users
+                        _showSearchDialog.value = true
+                    }
+                }
+                is SearchUsersResponse.SingleResult -> {
+                    _searchResults.value = listOf(result.user)
+                    _showSearchDialog.value = true
                 }
                 is SearchUsersResponse.Error -> {
                     _messageDialog.value = result.message
-                    _searchResults.value = emptyList()
+                    _isOrderSuccess.value = false
+                    _showResultDialog.value = true
                 }
             }
+
             _isLoading.value = false
         }
     }
@@ -201,5 +209,17 @@ class AddOrderViewModel(
         _showResultDialog.value = false
         _messageDialog.value = ""
         _isOrderSuccess.value = null
+    }
+
+    fun refreshProductsSilently() {
+        viewModelScope.launch {
+            try {
+                productRepository.syncProducts()
+            } catch (e: Exception) {
+                // Falla silencioso: si no hay red o da timeout, no molestamos al camarero
+                // porque ya está viendo los productos cacheados en Room
+                Log.w("ADD_ORDER_VM", "Sincronización silenciosa omitida (sin red o error de API)")
+            }
+        }
     }
 }

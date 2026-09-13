@@ -172,9 +172,15 @@ class MainActivity : ComponentActivity() {
         val workManager = WorkManager.getInstance(context)
 
         // --- PRODUCTOS ---
-        val periodicSyncProducts = PeriodicWorkRequestBuilder<SyncProductsWorker>(12, TimeUnit.HOURS)
+        val periodicSyncProducts = PeriodicWorkRequestBuilder<SyncProductsWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            "PeriodicSyncProductsWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            periodicSyncProducts
+        )
 
         workManager.enqueueUniquePeriodicWork(
             "PeriodicSyncProductsWork",

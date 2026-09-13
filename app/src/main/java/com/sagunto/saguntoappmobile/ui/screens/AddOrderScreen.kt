@@ -57,6 +57,7 @@ import com.sagunto.saguntoappmobile.ui.components.ProductCard
 import com.sagunto.saguntoappmobile.ui.components.StandardInputField
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 import com.sagunto.saguntoappmobile.ui.viewmodels.AddOrderViewModel
+import androidx.compose.runtime.LaunchedEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,6 +82,10 @@ fun AddOrderScreen(
     var showPaymentDialog by remember { mutableStateOf(false) }
 
     val totalPrice = cartItems.sumOf { it.priceSnapshot * it.quantity }
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshProductsSilently()
+    }
 
     Scaffold(
         topBar = {

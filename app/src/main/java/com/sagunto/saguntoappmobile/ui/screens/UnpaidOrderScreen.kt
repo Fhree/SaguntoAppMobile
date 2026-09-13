@@ -202,11 +202,11 @@ fun UnpaidOrderScreen(
                         viewModel.processPayment()
                     }
                 ) {
-                    Text("Sí, liquidar deuda")
+                    Text("PAGAR")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showConfirmDialog = false }) { Text("Cancelar") }
+                TextButton(onClick = { showConfirmDialog = false }) { Text("CANCELAR") }
             }
         )
     }
@@ -245,7 +245,11 @@ fun UnpaidOrderScreen(
                         items(searchResults) { user ->
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                onClick = { viewModel.selectCustomer(user) }
+                                onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+                                    viewModel.selectCustomer(user)
+                                }
                                 ) {
                                     Text(
                                         text = "${user.name} ${user.surname} (${user.saguntinoCode})",

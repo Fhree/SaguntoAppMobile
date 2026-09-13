@@ -129,7 +129,7 @@ class UserRepository(
     }
 
     override suspend fun searchUsers(query: String): SearchUsersResponse {
-        if (query.isBlank()) return SearchUsersResponse.Error("El campo de búsqueda está vacío")
+        if (query.isBlank()) return SearchUsersResponse.Error("El campo de búsqueda está vacío.")
 
         val cleanQuery = query.trim()
 
@@ -142,7 +142,6 @@ class UserRepository(
         }
 
         if (localMatches.isNotEmpty()) {
-            // Mapear entidades locales a UserResponse
             val mappedUsers = localMatches.map { entity ->
                 UserResponse(
                     id = entity.id,
@@ -151,20 +150,11 @@ class UserRepository(
                     saguntinoCode = entity.saguntinoCode
                 )
             }
-
-            // Si coincide exactamente con el código o solo hay 1 resultado exacto
-            val exactCodeMatch = mappedUsers.find {
-                it.saguntinoCode.equals(cleanQuery, ignoreCase = true)
-            }
-
-            return if (exactCodeMatch != null && mappedUsers.size == 1) {
-                SearchUsersResponse.SingleResult(exactCodeMatch)
-            } else {
-                SearchUsersResponse.MultipleResults(mappedUsers)
-            }
+            // Devolvemos siempre la lista para que la pantalla abra el selector
+            return SearchUsersResponse.MultipleResults(mappedUsers)
         }
 
-        // 2. Si no hay datos en local, intentar fallback contra la API (si hay conexión)
+        // 2. Si Room no devolvió nada, intentamos fallback contra la API (si hay cobertura)
         return try {
             if (saguntinoCodeRegex.matches(cleanQuery)) {
                 val response = httpClient.get("api/users/saguntino_code/${cleanQuery.uppercase()}") {
@@ -172,9 +162,10 @@ class UserRepository(
                 }
 
                 if (response.status.isSuccess()) {
-                    SearchUsersResponse.SingleResult(response.body())
+                    val user = response.body<UserResponse>()
+                    SearchUsersResponse.MultipleResults(listOf(user))
                 } else {
-                    SearchUsersResponse.Error("No existe ningún saguntino con ese código")
+                    SearchUsersResponse.Error("No existe ningún saguntino con el código $cleanQuery.")
                 }
             } else {
                 val response = httpClient.get("api/users/name/$cleanQuery") {
@@ -182,14 +173,20 @@ class UserRepository(
                 }
 
                 if (response.status.isSuccess()) {
-                    SearchUsersResponse.MultipleResults(response.body())
+                    val users = response.body<List<UserResponse>>()
+                    if (users.isNotEmpty()) {
+                        SearchUsersResponse.MultipleResults(users)
+                    } else {
+                        SearchUsersResponse.Error("No se encontraron saguntinos con ese criterio.")
+                    }
                 } else {
-                    SearchUsersResponse.Error("No se encontraron usuarios")
+                    SearchUsersResponse.Error("No se encontraron saguntinos con ese criterio.")
                 }
             }
         } catch (e: Exception) {
-            Log.w("API_FALLBACK_SKIPPED", "Sin conexión al servidor tras fallo local: ${e.message}")
-            SearchUsersResponse.Error("No se encontraron saguntinos con ese criterio")
+            // Si la tablet está offline y Room no tenía coincidencias:
+            Log.w("API_FALLBACK_SKIPPED", "Sin conexión tras fallo local: ${e.message}")
+            SearchUsersResponse.Error("No se encontró ningún saguntino con ese criterio.")
         }
     }
 
