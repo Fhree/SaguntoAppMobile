@@ -11,6 +11,5 @@ import androidx.room.RoomDatabase
 abstract class SaguntoDatabase : RoomDatabase() {
     abstract fun orderDao(): OrderDao
     abstract fun productDao(): ProductDao
-
     abstract fun userDao(): UserDao
 }

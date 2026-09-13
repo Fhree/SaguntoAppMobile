@@ -129,34 +129,67 @@ class UserRepository(
     }
 
     override suspend fun searchUsers(query: String): SearchUsersResponse {
-        if (query.isEmpty()) return SearchUsersResponse.Error("El campo de búsqueda está vacío")
+        if (query.isBlank()) return SearchUsersResponse.Error("El campo de búsqueda está vacío")
 
         val cleanQuery = query.trim()
 
+        // 1. Buscamos primero en la base de datos local (Room)
+        val localMatches = try {
+            userDao.searchUsersLocal(cleanQuery.lowercase())
+        } catch (e: Exception) {
+            Log.e("LOCAL_DB_ERROR", "Error consultando Room", e)
+            emptyList()
+        }
+
+        if (localMatches.isNotEmpty()) {
+            // Mapear entidades locales a UserResponse
+            val mappedUsers = localMatches.map { entity ->
+                UserResponse(
+                    id = entity.id,
+                    name = entity.name,
+                    surname = entity.surname,
+                    saguntinoCode = entity.saguntinoCode
+                )
+            }
+
+            // Si coincide exactamente con el código o solo hay 1 resultado exacto
+            val exactCodeMatch = mappedUsers.find {
+                it.saguntinoCode.equals(cleanQuery, ignoreCase = true)
+            }
+
+            return if (exactCodeMatch != null && mappedUsers.size == 1) {
+                SearchUsersResponse.SingleResult(exactCodeMatch)
+            } else {
+                SearchUsersResponse.MultipleResults(mappedUsers)
+            }
+        }
+
+        // 2. Si no hay datos en local, intentar fallback contra la API (si hay conexión)
         return try {
             if (saguntinoCodeRegex.matches(cleanQuery)) {
                 val response = httpClient.get("api/users/saguntino_code/${cleanQuery.uppercase()}") {
                     contentType(ContentType.Application.Json)
                 }
 
-                if (response.status.isSuccess())
+                if (response.status.isSuccess()) {
                     SearchUsersResponse.SingleResult(response.body())
-                else
+                } else {
                     SearchUsersResponse.Error("No existe ningún saguntino con ese código")
-
+                }
             } else {
                 val response = httpClient.get("api/users/name/$cleanQuery") {
                     contentType(ContentType.Application.Json)
                 }
 
-                if (response.status.isSuccess())
+                if (response.status.isSuccess()) {
                     SearchUsersResponse.MultipleResults(response.body())
-                else
-                    SearchUsersResponse.Error("Error al buscar usuarios por nombre en el servidor")
+                } else {
+                    SearchUsersResponse.Error("No se encontraron usuarios")
+                }
             }
         } catch (e: Exception) {
-            Log.e("API_ERROR_GET_USER", "💥 Ha fallado la petición HTTP", e)
-            SearchUsersResponse.Error("Error crítico de conexión: ${e.localizedMessage}")
+            Log.w("API_FALLBACK_SKIPPED", "Sin conexión al servidor tras fallo local: ${e.message}")
+            SearchUsersResponse.Error("No se encontraron saguntinos con ese criterio")
         }
     }
 
@@ -186,6 +219,7 @@ class UserRepository(
 
             if (response.status.isSuccess()) {
                 val networkData = response.body<List<SaguntinoOfflineDto>>()
+                Log.d("SYNC_USERS", "Descargados ${networkData.size} saguntinos del backend")
 
                 val entities = networkData.map { dto ->
                     UserEntity(
@@ -197,7 +231,8 @@ class UserRepository(
                     )
                 }
 
-                userDao.insertAll(entities)
+                val insertedIds = userDao.insertAll(entities)
+                Log.d("SYNC_USERS", "Insertados ${insertedIds.size} usuarios en Room")
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("Fallo HTTP: ${response.status.value}"))

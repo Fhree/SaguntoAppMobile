@@ -23,7 +23,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -118,21 +117,21 @@ fun AddOrderScreen(
                     Text(
                         text = "TOTAL:",
                         fontWeight = FontWeight.Black,
-                        fontSize = 20.sp,
+                        fontSize = 24.sp,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
                         text = "${"%.2f".format(totalPrice)} €",
                         fontWeight = FontWeight.Black,
-                        fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.onBackground
+                        fontSize = 32.sp, // 🛠️ Aumentado a 32.sp
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
                 Spacer(modifier = Modifier.height(SaguntoSpacing.medium))
 
                 Button(
-                    onClick = { showPaymentDialog = true }, // 🛠️ Dispara el primer modal
+                    onClick = { showPaymentDialog = true },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = cartItems.isNotEmpty() && !isLoading
                 ) {
@@ -166,7 +165,7 @@ fun AddOrderScreen(
                     },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded) },
                     modifier = Modifier
-                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                        .menuAnchor()
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -212,9 +211,12 @@ fun AddOrderScreen(
                                 }
                             },
                             onClick = {
-                                viewModel.addProductToCart(product)
-                                isDropdownExpanded = false
+                                if (isDropdownExpanded) {
+                                    isDropdownExpanded = false
+                                    viewModel.addProductToCart(product)
+                                }
                             },
+                            enabled = isDropdownExpanded,
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         )
                     }
@@ -242,11 +244,22 @@ fun AddOrderScreen(
 
     // 🛠️ --- DIÁLOGO 1: LA DECISIÓN DE PAGO ---
     if (showPaymentDialog) {
+        val formattedTotal = "${"%.2f".format(totalPrice)} €"
+
         if (viewModel.isSaguntino) {
             AlertDialog(
                 onDismissRequest = { showPaymentDialog = false },
-                title = { Text("Confirmación (Saguntino)") },
-                text = { Text("¿El cliente ha abonado la consumición en este momento?") },
+                title = { Text("Confirmación (Saguntino)", fontWeight = FontWeight.Bold) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Importe total: $formattedTotal",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
                 confirmButton = {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -256,11 +269,10 @@ fun AddOrderScreen(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
                                 showPaymentDialog = false
-                                // Paga ahora. El ViewModel inyectará el -2 internamente.
                                 viewModel.saveOrder(isPaid = true)
                             }
                         ) {
-                            Text("Sí, está pagado")
+                            Text("PAGAR ($formattedTotal)")
                         }
 
                         Button(
@@ -268,18 +280,17 @@ fun AddOrderScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
                             onClick = {
                                 showPaymentDialog = false
-                                // Deja a deber. Lanzamos el buscador de Saguntinos.
                                 viewModel.showSearchDialog()
                             }
                         ) {
-                            Text("No, dejar pendiente")
+                            Text("APUNTAR A DEBER")
                         }
 
                         TextButton(
                             modifier = Modifier.fillMaxWidth(),
                             onClick = { showPaymentDialog = false }
                         ) {
-                            Text("Cancelar y seguir editando", textAlign = TextAlign.Center)
+                            Text("AÑADIR MÁS PRODUCTOS", textAlign = TextAlign.Center)
                         }
                     }
                 }
@@ -287,8 +298,21 @@ fun AddOrderScreen(
         } else {
             AlertDialog(
                 onDismissRequest = { showPaymentDialog = false },
-                title = { Text("Confirmación (Invitado)") },
-                text = { Text("Los usuarios no saguntinos deben abonar la consumición en el momento de pedir.\n\n¿Confirmar creación y cobro del pedido?") },
+                title = { Text("Confirmación (Invitado)", fontWeight = FontWeight.Bold) },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Importe total: $formattedTotal",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Los usuarios no saguntinos deben abonar la consumición en el momento de pedir.\n\n",
+                            fontSize = 16.sp
+                        )
+                    }
+                },
                 confirmButton = {
                     Button(
                         onClick = {
@@ -296,11 +320,11 @@ fun AddOrderScreen(
                             viewModel.saveOrder(isPaid = true)
                         }
                     ) {
-                        Text("Confirmar y cobrar")
+                        Text("PAGAR ($formattedTotal)")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showPaymentDialog = false }) { Text("Cancelar") }
+                    TextButton(onClick = { showPaymentDialog = false }) { Text("AÑADIR MÁS PRODUCTOS") }
                 }
             )
         }
@@ -310,7 +334,7 @@ fun AddOrderScreen(
     if (showSearchDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissSearchDialog() },
-            title = { Text("Buscar Saguntino moroso") },
+            title = { Text("Buscar Saguntino") },
             text = {
                 Column {
                     StandardInputField(

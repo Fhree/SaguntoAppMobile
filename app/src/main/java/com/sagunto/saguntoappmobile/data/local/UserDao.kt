@@ -9,7 +9,12 @@ import androidx.room.Query
 @JvmSuppressWildcards
 interface UserDao {
 
-    @Query("SELECT * FROM users WHERE normalizedSearch LIKE '%' || :query || '%' ORDER BY name ASC")
+    @Query("""
+        SELECT * FROM users 
+        WHERE LOWER(saguntinoCode) = LOWER(:query) 
+           OR normalizedSearch LIKE '%' || LOWER(:query) || '%' 
+        ORDER BY name ASC
+    """)
     suspend fun searchUsersLocal(query: String): List<UserEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

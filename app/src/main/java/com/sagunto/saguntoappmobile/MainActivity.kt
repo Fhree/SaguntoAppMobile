@@ -41,6 +41,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.concurrent.TimeUnit
+import com.sagunto.saguntoappmobile.workers.SyncUsersWorker
 
 class MainActivity : ComponentActivity() {
 
@@ -165,25 +166,37 @@ class MainActivity : ComponentActivity() {
 
     private fun setupBackgroundSync(context: Context) {
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .setRequiredNetworkType(NetworkType.CONNECTED) // Cambiado a CONNECTED: UNMETERED ignora Wi-Fis marcadas como medidas o datos móviles
             .build()
 
-        val periodicSync = PeriodicWorkRequestBuilder<SyncProductsWorker>(
-            12, TimeUnit.HOURS
-        )
+        val workManager = WorkManager.getInstance(context)
+
+        // --- PRODUCTOS ---
+        val periodicSyncProducts = PeriodicWorkRequestBuilder<SyncProductsWorker>(12, TimeUnit.HOURS)
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        workManager.enqueueUniquePeriodicWork(
             "PeriodicSyncProductsWork",
             ExistingPeriodicWorkPolicy.KEEP,
-            periodicSync
+            periodicSyncProducts
         )
 
-        val immediateSync = OneTimeWorkRequestBuilder<SyncProductsWorker>()
-            //.setConstraints(constraints)
+        val immediateSyncProducts = OneTimeWorkRequestBuilder<SyncProductsWorker>().build()
+        workManager.enqueue(immediateSyncProducts)
+
+        // --- USUARIOS SAGUNTINOS ---
+        val periodicSyncUsers = PeriodicWorkRequestBuilder<SyncUsersWorker>(12, TimeUnit.HOURS)
+            .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(context).enqueue(immediateSync)
+        workManager.enqueueUniquePeriodicWork(
+            "PeriodicSyncUsersWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            periodicSyncUsers
+        )
+
+        val immediateSyncUsers = OneTimeWorkRequestBuilder<SyncUsersWorker>().build()
+        workManager.enqueue(immediateSyncUsers)
     }
 }

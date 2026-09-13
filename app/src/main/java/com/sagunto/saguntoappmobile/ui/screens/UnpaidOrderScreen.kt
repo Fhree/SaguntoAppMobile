@@ -21,6 +21,8 @@ import com.sagunto.saguntoappmobile.ui.components.StandardInputField
 import com.sagunto.saguntoappmobile.ui.components.UnpaidOrderCard
 import com.sagunto.saguntoappmobile.ui.theme.SaguntoSpacing
 import com.sagunto.saguntoappmobile.ui.viewmodels.UnpaidOrderViewModel
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +44,8 @@ fun UnpaidOrderScreen(
     val isPaymentSuccess by viewModel.isPaymentSuccess.collectAsState()
 
     var showConfirmDialog by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     Scaffold(
         topBar = {
@@ -127,7 +131,11 @@ fun UnpaidOrderScreen(
                 Button(
                     modifier = Modifier.height(56.dp),
                     shape = MaterialTheme.shapes.medium,
-                    onClick = { viewModel.executeSearch() }
+                    onClick = {
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        viewModel.executeSearch()
+                    }
                 ) {
                     Icon(Icons.Default.Search, contentDescription = "Buscar")
                 }

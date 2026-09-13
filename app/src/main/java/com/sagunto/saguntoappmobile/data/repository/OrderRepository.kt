@@ -83,7 +83,7 @@ class OrderRepository(
         }
     }
 
-    override suspend fun payOrders(customerId: Int): Result<String> {
+    override suspend fun payOrders(customerId: Int): Result<Unit> {
         return try {
             val response = httpClient.post("api/orders/${customerId}/payall") {
                 contentType(ContentType.Application.Json)
@@ -99,4 +99,5 @@ class OrderRepository(
             return Result.failure(e)
         }
     }
+
 }
